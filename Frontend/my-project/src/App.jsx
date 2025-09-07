@@ -8,12 +8,19 @@ import DashboardAdmin from "./Dashboard/admin/pages/DashboardAmin";
 import LayoutDashboard from "./Dashboard/admin/layout/Layout";
 import AllUser from "./Dashboard/admin/pages/AllUser";
 import ProtectedRoute from "./Frontend/components/protectedRoute/ProtectedRoute";
+import DashboardVendor from "./Dashboard/vendor/pages/DashboardVendor";
+import LayoutDashboardVd from "./Dashboard/vendor/layout/LayoutVendor";
+import VendorProduct from "./Dashboard/vendor/pages/VendorProduct";
+import ProductUI from "./Frontend/components/ProductUi/ProductUi";
 const App = () => {
   return (
     <Routes>
       {/* Public Routes */}
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/:serviceType" element={<ProductUI />} />
+        <Route path="/:serviceType/:venue" element={<ProductUI />} />
+        <Route path="vendor/:serviceType" element={<ProductUI />} />
         <Route path="register" element={<Register />} />
         <Route path="login" element={<Login />} />
       </Route>
@@ -23,6 +30,14 @@ const App = () => {
         <Route element={<LayoutDashboard />}>
           <Route path="/dashboard/admin" element={<DashboardAdmin />} />
           <Route path="/admin/users" element={<AllUser />} />
+        </Route>
+      </Route>
+      {/* vendor protected routes */}
+
+      <Route element={<ProtectedRoute allowedRoles={["vendor"]} />}>
+        <Route element={<LayoutDashboardVd />}>
+          <Route path="/dashboard/vendor" element={<DashboardVendor />} />
+          <Route path="/vendor/products" element={<VendorProduct />} />
         </Route>
       </Route>
     </Routes>

@@ -32,25 +32,30 @@ const Navbar = () => {
               </Link>
             </li>
 
-            {/* Venues Dropdown */}
             <li
               className="relative cursor-pointer"
               onMouseEnter={() => setOpenDropdown("venues")}
               onMouseLeave={() => setOpenDropdown("")}
             >
               <div className="flex items-center gap-1 hover:text-pink-600 transition-colors duration-300">
-                Venues <IoIosArrowDown />
+                <Link
+                  to="/hall"
+                  className="flex items-center gap-1 hover:text-pink-600 transition-colors duration-300"
+                >
+                  {" "}
+                  Venues <IoIosArrowDown />
+                </Link>
               </div>
               {openDropdown === "venues" && (
                 <ul className="absolute top-full mt-2 w-48 bg-white shadow-lg rounded-lg overflow-hidden">
                   <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
-                    <Link to="/venues/halls">Banquet Halls</Link>
+                    <Link to="/hall/BanquetHall">Banquet Halls</Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
-                    <Link to="/venues/outdoor">Outdoor Gardens</Link>
+                    <Link to="/hall/OutdoorGarden">Outdoor Gardens</Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
-                    <Link to="/venues/resorts">Resorts</Link>
+                    <Link to="/hall/Resort">Resorts</Link>
                   </li>
                 </ul>
               )}
@@ -68,13 +73,13 @@ const Navbar = () => {
               {openDropdown === "vendor" && (
                 <ul className="absolute top-full mt-2 w-48 bg-white shadow-lg rounded-lg overflow-hidden">
                   <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
-                    <Link to="/vendors/photographers">Photographers</Link>
+                    <Link to="/vendor/photographers">Photographers</Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
-                    <Link to="/vendors/caterers">Caterers</Link>
+                    <Link to="/vendor/catering">Caterers</Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
-                    <Link to="/vendors/decorators">Decorators</Link>
+                    <Link to="/vendor/decorators">Decorators</Link>
                   </li>
                 </ul>
               )}

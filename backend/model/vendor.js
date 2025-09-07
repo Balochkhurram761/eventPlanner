@@ -10,7 +10,14 @@ const VendorSchema = new mongoose.Schema(
 
     serviceType: {
       type: String,
-      enum: ["hall", "catering", "dj"],
+      enum: [
+        "hall",
+        "catering",
+        "dj",
+        "photographers",
+        "decorators",
+        "carRental",
+      ],
       required: true,
     },
 
@@ -23,15 +30,23 @@ const VendorSchema = new mongoose.Schema(
     description: {
       type: String,
       required: true,
+      trim: true,
     },
 
     images: {
       type: [String],
     },
 
-    // 🏢 Hall Specific Fields
+    // 🏛️ Hall specific fields
+    venue: {
+      type: String,
+      enum: ["BanquetHall", "OutdoorGarden", "Resort"],
+      required: function () {
+        return this.serviceType === "hall";
+      },
+    },
     hallCapacity: {
-      type: Number, // e.g. 500 persons
+      type: Number,
       min: 50,
       max: 2000,
       required: function () {
@@ -39,8 +54,8 @@ const VendorSchema = new mongoose.Schema(
       },
     },
     hallPricePerHead: {
-      type: Number, // e.g. 2000 PKR per head
-      min: 500,
+      type: String,
+      min: 200,
       max: 10000,
       required: function () {
         return this.serviceType === "hall";
@@ -53,15 +68,15 @@ const VendorSchema = new mongoose.Schema(
       },
     },
 
-    // 🍽 Catering Specific Fields
+    // 🍽️ Catering specific
     cateringMenu: {
-      type: [String], // e.g. ["Biryani", "Karahi", "BBQ"]
+      type: [String],
       required: function () {
         return this.serviceType === "catering";
       },
     },
     cateringPricePerHead: {
-      type: Number, // e.g. 1200 PKR per head
+      type: Number,
       min: 200,
       max: 5000,
       required: function () {
@@ -69,9 +84,9 @@ const VendorSchema = new mongoose.Schema(
       },
     },
 
-    // 🎵 DJ Specific Fields
+    // 🎵 DJ specific
     djRate: {
-      type: Number, // e.g. 30,000 PKR per event
+      type: Number,
       min: 5000,
       max: 200000,
       required: function () {
@@ -79,12 +94,65 @@ const VendorSchema = new mongoose.Schema(
       },
     },
     djDuration: {
-      type: String, // e.g. "4 hours"
+      type: String,
       required: function () {
         return this.serviceType === "dj";
       },
     },
 
+    // 📸 Photographers specific
+    photographerPackage: {
+      type: String, // e.g. "Wedding + Reception Coverage"
+      required: function () {
+        return this.serviceType === "photographers";
+      },
+    },
+    photographerPrice: {
+      type: Number,
+      min: 5000,
+      max: 500000,
+      required: function () {
+        return this.serviceType === "photographers";
+      },
+    },
+
+    decoratorTheme: {
+      type: String, // e.g. "Floral Theme"
+      required: function () {
+        return this.serviceType === "decorators";
+      },
+    },
+    decoratorPrice: {
+      type: Number,
+      min: 10000,
+      max: 1000000,
+      required: function () {
+        return this.serviceType === "decorators";
+      },
+    },
+
+    carType: {
+      type: String, // e.g. "Luxury Car", "Limo", "SUV"
+      required: function () {
+        return this.serviceType === "carRental";
+      },
+    },
+    carRentalPrice: {
+      type: Number, // e.g. 15000 PKR per day
+      min: 1000,
+      max: 200000,
+      required: function () {
+        return this.serviceType === "carRental";
+      },
+    },
+    carRentalDuration: {
+      type: String, // e.g. "Per Hour", "Per Day"
+      required: function () {
+        return this.serviceType === "carRental";
+      },
+    },
+
+    // ⭐ Reviews
     ratings: {
       type: Number,
       min: 0,
@@ -99,9 +167,12 @@ const VendorSchema = new mongoose.Schema(
         createdAt: { type: Date, default: Date.now },
       },
     ],
+
+    // 📍 General info
     city: {
       type: String,
       required: true,
+      trim: true,
     },
     contactNumber: {
       type: String,
@@ -117,5 +188,4 @@ const VendorSchema = new mongoose.Schema(
 );
 
 const Vendor = mongoose.model("Vendor", VendorSchema);
-
 export default Vendor;

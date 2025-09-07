@@ -2,9 +2,10 @@ import React from "react";
 import NavbarAdmin from "../components/navbarAdmin/NavbarAdmin";
 import SideBar from "../components/sidebar/SideBar";
 import { Outlet } from "react-router-dom";
-import { SearchProvider } from "../context/SearchContext";
-import { UserProvider } from "../context/userContext";
 import { NavbarProvider } from "../../../Frontend/context/NavbarContext";
+
+import { UserProvider } from "../context/userContext";
+import { SearchProvider } from "../context/SearchContext";
 
 const LayoutDashboard = () => {
   return (

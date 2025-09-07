@@ -8,6 +8,7 @@ import {
 import {
   deleteproduct,
   fetchdata,
+  getdata,
   updateProduct,
   UploadProduct,
 } from "../controller/Vendor.js";
@@ -31,6 +32,7 @@ router.put(
   authorizeRoles("admin"),
   updatestatus
 );
+// end admin
 // start vendor
 router.post(
   "/vendor/uploadproduct",
@@ -59,5 +61,9 @@ router.put(
   upload.none(),
   updateProduct
 );
+
+// getdata all in fronted
+
+router.get("/getdata", getdata);
 
 export default router;
