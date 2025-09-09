@@ -10,17 +10,23 @@ export const UploadProduct = async (req, res) => {
       // hall
       hallCapacity,
       hallPricePerHead,
-      hallLocation,
+      Location,
       venue,
       // catering
       cateringMenu,
-      cateringPricePerHead,
+      cateringminPerHead,
+      cateringmaxPerHead,
+      cateringServices: { sound, plates, seating, waiters, decoration },
+
       // dj
       djRate,
       djDuration,
       // photographers
+      photographerStartingRange,
+      photographerexpectedRange,
+      adddtionalinformation,
       photographerPackage,
-      photographerPrice,
+      photographerPlans,
       // decorators
       decoratorTheme,
       decoratorPrice,
@@ -28,7 +34,12 @@ export const UploadProduct = async (req, res) => {
       carType,
       carRentalPrice,
       carRentalDuration,
+      Seats,
+      Door,
+      Transmission,
       // general
+      cancellation,
+      staff,
       city,
       contactNumber,
     } = req.body;
@@ -47,26 +58,39 @@ export const UploadProduct = async (req, res) => {
       venue,
       hallCapacity,
       hallPricePerHead,
-      hallLocation,
-
-      // catering fields
+      Location,
       cateringMenu,
-      cateringPricePerHead,
+      cateringminPerHead,
+      cateringmaxPerHead,
+      cateringServices: {
+        sound,
+        plates,
+        seating,
+        waiters,
+        decoration,
+      },
 
       // dj fields
       djRate,
       djDuration,
 
       // photographer fields
+      photographerStartingRange,
+      photographerexpectedRange,
+      adddtionalinformation,
       photographerPackage,
-      photographerPrice,
-
+      photographerPlans,
       // decorator fields
       decoratorTheme,
       decoratorPrice,
       carType,
       carRentalPrice,
       carRentalDuration,
+      Seats,
+      Door,
+      Transmission,
+      cancellation,
+      staff,
       city,
       contactNumber,
     });
@@ -198,7 +222,7 @@ export const getdata = async (req, res) => {
     if (city) {
       filter.city = city;
     }
-    
+
     if (search) {
       filter.title = { $regex: search, $options: "i" };
     }
@@ -247,6 +271,34 @@ export const getdata = async (req, res) => {
     });
   } catch (error) {
     console.error("getdata error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+export const getone = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await Vendor.findById(id).populate("user");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Vendor not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully fetched data",
+      data: user,
+    });
+  } catch (error) {
+    console.error("getone error:", error.message);
     res.status(500).json({
       success: false,
       message: "Server error",

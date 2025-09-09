@@ -8,7 +8,7 @@ import {
 
 const Footer = () => {
   return (
-    <footer className="bg-[#111] text-gray-300 pt-14 pb-6 mt-10">
+    <footer className="bg-[#111] text-gray-300 pt-14 pb-6 ">
       <div className="w-[88%] mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 justify-items-center gap-12 text-center md:text-left">
         {/* Brand Section */}
         <div>

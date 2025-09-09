@@ -73,13 +73,19 @@ const Navbar = () => {
               {openDropdown === "vendor" && (
                 <ul className="absolute top-full mt-2 w-48 bg-white shadow-lg rounded-lg overflow-hidden">
                   <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
-                    <Link to="/vendor/photographers">Photographers</Link>
+                    <Link to="/photographers">Photographers</Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
-                    <Link to="/vendor/catering">Caterers</Link>
+                    <Link to="/catering">Caterers</Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
-                    <Link to="/vendor/decorators">Decorators</Link>
+                    <Link to="/decorators">Decorators</Link>
+                  </li>
+                  <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
+                    <Link to="/carRental">Car Rental</Link>
+                  </li>
+                  <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
+                    <Link to="/dj">Dj</Link>
                   </li>
                 </ul>
               )}

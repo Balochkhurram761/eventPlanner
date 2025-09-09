@@ -11,6 +11,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const UploadProduct = () => {
   const { searchQuery, setSearchQuery, products, setProducts } = useProduct();
+
   const [filed, setFiled] = useState("hall");
   const [open, setOpen] = useState(false);
 
@@ -21,19 +22,36 @@ const UploadProduct = () => {
     images: [],
     hallCapacity: "",
     hallPricePerHead: "",
-    hallLocation: "",
+    Location: "",
     cateringMenu: "",
-    cateringPricePerHead: "",
+    cateringminPerHead: "",
+    cateringmaxPerHead: "",
+    cateringServices: {
+      sound: "",
+      plates: "",
+      seating: "",
+      waiters: "",
+      decoration: "",
+    },
     djRate: "",
     djDuration: "",
-    venue:"",
+    venue: "",
     photographerPackage: "",
+    photographerStartingRange: "",
+    photographerexpectedRange: "",
+    adddtionalinformation: "",
     photographerPrice: "",
     decoratorTheme: "",
     decoratorPrice: "",
     carType: "",
+
     carRentalPrice: "",
     carRentalDuration: "",
+    Seats: "",
+    Door: "",
+    Transmission: "",
+    cancellation: "",
+    staff: [],
     city: "",
     contactNumber: "",
   });
@@ -55,6 +73,16 @@ const UploadProduct = () => {
     setProductForm((prev) => ({
       ...prev,
       images: [...prev.images, ...files],
+    }));
+  };
+  const handleCateringService = (e) => {
+    const { name, value } = e.target;
+    setProductForm((prev) => ({
+      ...prev,
+      cateringServices: {
+        ...prev.cateringServices,
+        [name]: value === "true", // string → boolean
+      },
     }));
   };
 
@@ -103,20 +131,35 @@ const UploadProduct = () => {
         images: [],
         hallCapacity: "",
         hallPricePerHead: "",
-        hallLocation: "",
+        Location: "",
         cateringMenu: "",
-        cateringPricePerHead: "",
+        cateringminPerHead: "",
+        cateringmaxPerHead: "",
+        cateringServices: {
+          sound: false,
+          plates: false,
+          seating: false,
+          waiters: false,
+          decoration: false,
+        },
         djRate: "",
         djDuration: "",
-
+        venue: "",
         photographerPackage: "",
-        photographerPrice: "",
+        photographerStartingRange: "",
+        photographerexpectedRange: "",
+        adddtionalinformation: "",
 
         decoratorTheme: "",
         decoratorPrice: "",
         carType: "",
         carRentalPrice: "",
         carRentalDuration: "",
+        Seats: "",
+        Door: "",
+        Transmission: "",
+        cancellation: "",
+        staff: [],
         city: "",
         contactNumber: "",
       });
@@ -339,14 +382,6 @@ const UploadProduct = () => {
                   placeholder="Price Per Head"
                   className="border rounded-lg p-2 outline-none"
                 />
-                <input
-                  type="text"
-                  onChange={handleform}
-                  name="hallLocation"
-                  value={productForm.hallLocation}
-                  placeholder="Location"
-                  className="border rounded-lg p-2 outline-none"
-                />
 
                 <select
                   name="venue"
@@ -376,9 +411,93 @@ const UploadProduct = () => {
                 <input
                   type="text"
                   onChange={handleform}
-                  name="cateringPricePerHead"
-                  value={productForm.cateringPricePerHead}
-                  placeholder="Catering Price Per Head"
+                  name="cateringminPerHead"
+                  value={productForm.cateringminPerHead}
+                  placeholder="Catering min Price Per Head"
+                  className="border rounded-lg p-2 outline-none"
+                />
+                <input
+                  type="text"
+                  onChange={handleform}
+                  name="cateringmaxPerHead"
+                  value={productForm.cateringmaxPerHead}
+                  placeholder="Catering max Price Per Head"
+                  className="border rounded-lg p-2 outline-none"
+                />
+                <label htmlFor="">Sounds</label>
+                <select
+                  name="sound"
+                  value={productForm.cateringServices.sound}
+                  onChange={handleCateringService}
+                  id=""
+                >
+                  <option value="">Option Select</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+                <label htmlFor="">Plates</label>
+                <select
+                  name="plates"
+                  value={productForm.cateringServices.plates}
+                  onChange={handleCateringService}
+                  id=""
+                >
+                  <option value="">Option Select</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+                <label htmlFor="">Seating</label>
+                <select
+                  name="seating"
+                  value={productForm.cateringServices.seating}
+                  onChange={handleCateringService}
+                  id=""
+                >
+                  <option value="">Option Select</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+                <label htmlFor="">Waiters</label>
+                <select
+                  name="waiters"
+                  value={productForm.cateringServices.waiters}
+                  onChange={handleCateringService}
+                  id=""
+                >
+                  <option value="">Option Select</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+                <label htmlFor="">Decoration</label>
+                <select
+                  name="decoration"
+                  onChange={handleCateringService}
+                  value={productForm.cateringServices.decoration}
+                  id=""
+                >
+                  <option value="">Option Select</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+                <input
+                  type="text"
+                  onChange={handleform}
+                  name="cancellation"
+                  value={productForm.cancellation}
+                  placeholder="Catering cancellation"
+                  className="border rounded-lg p-2 outline-none"
+                />
+                <input
+                  type="text"
+                  onChange={(e) => {
+                    const value = e.target.value
+                      .split(",")
+                      .map((s) => s.trim());
+                    setProductForm((prev) => ({ ...prev, staff: value }));
+                  }}
+                  value={productForm.staff.join(", ")}
+                  name="staff"
+                  placeholder="Enter staff (e.g. Male, Female)"
                   className="border rounded-lg p-2 outline-none"
                 />
               </>
@@ -416,11 +535,50 @@ const UploadProduct = () => {
                   className="border rounded-lg p-2 outline-none"
                 />
                 <input
+                  type="number"
+                  onChange={handleform}
+                  name="photographerStartingRange"
+                  value={productForm.photographerStartingRange}
+                  placeholder="Photographer started Price"
+                  className="border rounded-lg p-2 outline-none"
+                />
+                <input
+                  type="number"
+                  onChange={handleform}
+                  name="photographerexpectedRange"
+                  value={productForm.photographerexpectedRange}
+                  placeholder="Photographer expected Price"
+                  className="border rounded-lg p-2 outline-none"
+                />
+                {/* Catering Services Checkboxes */}
+
+                <input
                   type="text"
                   onChange={handleform}
-                  name="photographerPrice"
-                  value={productForm.photographerPrice}
-                  placeholder="Photographer Price"
+                  name="cancellation"
+                  value={productForm.cancellation}
+                  placeholder="Decorator cancellation"
+                  className="border rounded-lg p-2 outline-none"
+                />
+                <input
+                  type="text"
+                  onChange={(e) => {
+                    const value = e.target.value
+                      .split(",")
+                      .map((s) => s.trim());
+                    setProductForm((prev) => ({ ...prev, staff: value }));
+                  }}
+                  value={productForm.staff.join(", ")}
+                  name="staff"
+                  placeholder="Enter staff (e.g. Male, Female)"
+                  className="border rounded-lg p-2 outline-none"
+                />
+                <input
+                  type="text"
+                  onChange={handleform}
+                  name="adddtionalinformation"
+                  value={productForm.adddtionalinformation}
+                  placeholder="addtionalinformatio"
                   className="border rounded-lg p-2 outline-none"
                 />
               </>
@@ -441,6 +599,27 @@ const UploadProduct = () => {
                   name="decoratorPrice"
                   value={productForm.decoratorPrice}
                   placeholder="Decorator Price"
+                  className="border rounded-lg p-2 outline-none"
+                />
+                <input
+                  type="text"
+                  onChange={handleform}
+                  name="cancellation"
+                  value={productForm.cancellation}
+                  placeholder="Decorator cancellation"
+                  className="border rounded-lg p-2 outline-none"
+                />
+                <input
+                  type="text"
+                  onChange={(e) => {
+                    const value = e.target.value
+                      .split(",")
+                      .map((s) => s.trim());
+                    setProductForm((prev) => ({ ...prev, staff: value }));
+                  }}
+                  value={productForm.staff.join(", ")}
+                  name="staff"
+                  placeholder="Enter staff (e.g. Male, Female)"
                   className="border rounded-lg p-2 outline-none"
                 />
               </>
@@ -471,6 +650,30 @@ const UploadProduct = () => {
                   placeholder="CarRentalDuration"
                   className="border rounded-lg p-2 outline-none"
                 />
+                <input
+                  type="number"
+                  onChange={handleform}
+                  name="Seats"
+                  value={productForm.Seats}
+                  placeholder="Enter Total Seats in Car"
+                  className="border rounded-lg p-2 outline-none"
+                />
+                <input
+                  type="number"
+                  onChange={handleform}
+                  name="Door"
+                  value={productForm.Door}
+                  placeholder="Enter total Door in Car"
+                  className="border rounded-lg p-2 outline-none"
+                />
+                <input
+                  type="text"
+                  onChange={handleform}
+                  name="Transmission"
+                  value={productForm.Transmission}
+                  placeholder="Enter Auto/ Manual"
+                  className="border rounded-lg p-2 outline-none"
+                />
               </>
             )}
             <input
@@ -481,6 +684,15 @@ const UploadProduct = () => {
               placeholder="Enter Contact Number"
               className="border rounded-lg p-2 outline-none"
             />
+            <textarea
+              onChange={handleform}
+              name="Location"
+              value={productForm.Location}
+              placeholder="Enter Address"
+              className="border rounded-lg p-2 outline-none resize-none"
+              rows={3}
+            />
+
             <input
               type="text"
               onChange={handleform}

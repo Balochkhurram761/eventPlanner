@@ -9,6 +9,7 @@ import {
   deleteproduct,
   fetchdata,
   getdata,
+  getone,
   updateProduct,
   UploadProduct,
 } from "../controller/Vendor.js";
@@ -65,5 +66,6 @@ router.put(
 // getdata all in fronted
 
 router.get("/getdata", getdata);
+router.get("/getsingle/:id", getone);
 
 export default router;

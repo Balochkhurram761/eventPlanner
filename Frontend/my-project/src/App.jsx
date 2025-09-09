@@ -12,15 +12,18 @@ import DashboardVendor from "./Dashboard/vendor/pages/DashboardVendor";
 import LayoutDashboardVd from "./Dashboard/vendor/layout/LayoutVendor";
 import VendorProduct from "./Dashboard/vendor/pages/VendorProduct";
 import ProductUI from "./Frontend/components/ProductUi/ProductUi";
+import ProductUiDesc from "./Frontend/components/ProductUiDesc/ProductUiDesc";
 const App = () => {
   return (
     <Routes>
       {/* Public Routes */}
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/:serviceType" element={<ProductUI />} />
+        <Route path="/:serviceType/:venue/:id" element={<ProductUiDesc />} />
+        <Route path="/:serviceType/:id" element={<ProductUiDesc />} />
         <Route path="/:serviceType/:venue" element={<ProductUI />} />
-        <Route path="vendor/:serviceType" element={<ProductUI />} />
+        <Route path="/:serviceType" element={<ProductUI />} />
+
         <Route path="register" element={<Register />} />
         <Route path="login" element={<Login />} />
       </Route>

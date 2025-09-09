@@ -15,8 +15,10 @@ const HeroSection3 = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      const data = await fetchProducts("catering", city);
-      console.log(data, "catering nice");
+      const data = await fetchProducts({
+        serviceType: "catering",
+        location: city,
+      });
       setProducts(data);
     };
     loadData();
@@ -30,7 +32,7 @@ const HeroSection3 = () => {
           <h2 className="text-2xl font-bold">Catering Services</h2>
         </div>
         <div className="cities flex gap-1.5 my-4">
-          {["Lahore", "Karachi", "Islamabad"].map((c) => (
+          {["lahore", "karachi", "islamabad"].map((c) => (
             <button
               key={c}
               onClick={() => setCity(c)}

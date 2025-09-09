@@ -11,12 +11,14 @@ import { useProduct } from "../../context/ProductContext";
 const HeroSection4 = () => {
   const { fetchProducts } = useProduct();
   const [products, setProducts] = useState([]);
-  const [city, setCity] = useState("Lahore"); 
+  const [city, setCity] = useState("lahore");
 
   useEffect(() => {
     const loadData = async () => {
-      const data = await fetchProducts("dj", city);
-   console.log(data, "data");
+      const data = await fetchProducts({
+        serviceType: "dj",
+        location: city,
+      });
       setProducts(data);
     };
     loadData();
@@ -30,7 +32,7 @@ const HeroSection4 = () => {
           <h2 className="text-2xl font-bold">Dj Services</h2>
         </div>
         <div className="cities flex gap-1.5 my-4">
-          {["Lahore", "Karachi", "Islamabad"].map((c) => (
+          {["lahore", "karachi", "islamabad"].map((c) => (
             <button
               key={c}
               onClick={() => setCity(c)}
@@ -54,7 +56,7 @@ const HeroSection4 = () => {
         breakpoints={{
           300: { slidesPerView: 1 },
           640: { slidesPerView: 2 },
-          1024: { slidesPerView: 3 },
+          1024: { slidesPerView: 5 },
         }}
         className=""
       >
@@ -65,13 +67,10 @@ const HeroSection4 = () => {
                 <img
                   src={`http://localhost:5000/${item.images[0]}`}
                   alt={item.title}
-                  className="w-full h-48 object-cover"
+                  className="w-full h-50 object-cover"
                 />
                 <div className="p-4">
                   <h3 className="text-lg font-semibold">{item.title}</h3>
-                  <p className="text-sm text-gray-600 line-clamp-2">
-                    {item.description}
-                  </p>
                 </div>
               </div>
             </SwiperSlide>

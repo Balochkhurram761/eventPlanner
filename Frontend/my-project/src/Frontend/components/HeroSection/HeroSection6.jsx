@@ -11,12 +11,15 @@ import { useProduct } from "../../context/ProductContext";
 const HeroSection6 = () => {
   const { fetchProducts } = useProduct();
   const [products, setProducts] = useState([]);
-  const [city, setCity] = useState("Lahore"); // ✅ default Lahore
+  const [city, setCity] = useState("lahore"); // ✅ default Lahore
 
   useEffect(() => {
     const loadData = async () => {
-      const data = await fetchProducts("decorators", city);
-   console.log(data, "dataphoto");
+      const data = await fetchProducts({
+        serviceType: "decorators",
+        location: city,
+      });
+      console.log(data, "dataphoto");
       setProducts(data);
     };
     loadData();
@@ -30,7 +33,7 @@ const HeroSection6 = () => {
           <h2 className="text-2xl font-bold">Decorators Services</h2>
         </div>
         <div className="cities flex gap-1.5 my-4">
-          {["Lahore", "Karachi", "Islamabad"].map((c) => (
+          {["lahore", "karachi", "islamabad"].map((c) => (
             <button
               key={c}
               onClick={() => setCity(c)}
