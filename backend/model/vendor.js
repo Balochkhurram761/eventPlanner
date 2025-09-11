@@ -67,12 +67,14 @@ const VendorSchema = new mongoose.Schema(
     },
 
     // 🍽️ Catering specific
-    cateringMenu: {
-      type: [String],
-      required: function () {
-        return this.serviceType === "catering";
-      },
+    cateringMenu: [
+    {
+      title: { type: String, required: true }, 
+      price: { type: Number, required: true },   
+      details: [{ type: String }],              
     },
+  ],
+
     cateringminPerHead: {
       type: Number,
       required: function () {

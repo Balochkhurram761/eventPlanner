@@ -7,6 +7,7 @@ import "swiper/css/pagination";
 
 import { Autoplay, Pagination } from "swiper/modules";
 import { useProduct } from "../../context/ProductContext";
+import { Link } from "react-router-dom";
 
 const HeroSection4 = () => {
   const { fetchProducts } = useProduct();
@@ -62,7 +63,9 @@ const HeroSection4 = () => {
       >
         {products && products.length > 0 ? (
           products.map((item) => (
+            
             <SwiperSlide key={item._id}>
+              <Link to={`/${item.serviceType}/${item._id}`}>
               <div className="bg-white my-2.5 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                 <img
                   src={`http://localhost:5000/${item.images[0]}`}
@@ -73,6 +76,7 @@ const HeroSection4 = () => {
                   <h3 className="text-lg font-semibold">{item.title}</h3>
                 </div>
               </div>
+              </Link>
             </SwiperSlide>
           ))
         ) : (

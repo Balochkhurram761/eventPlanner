@@ -16,8 +16,7 @@ export const UploadProduct = async (req, res) => {
       cateringMenu,
       cateringminPerHead,
       cateringmaxPerHead,
-      cateringServices: { sound, plates, seating, waiters, decoration },
-
+      cateringServices,
       // dj
       djRate,
       djDuration,
@@ -46,7 +45,12 @@ export const UploadProduct = async (req, res) => {
 
     const userId = req.user._id;
     console.log("token id ", userId);
-
+    let parsedCatering = cateringServices ? JSON.parse(cateringServices) : {};
+    Object.keys(parsedCatering).forEach((key) => {
+      if (parsedCatering[key] === "" || parsedCatering[key] === undefined) {
+        parsedCatering[key] = false; // ya null rakhna hai to null
+      }
+    });
     const newVendor = new Vendor({
       user: userId,
       serviceType,
@@ -59,16 +63,10 @@ export const UploadProduct = async (req, res) => {
       hallCapacity,
       hallPricePerHead,
       Location,
-      cateringMenu,
+      cateringMenu: cateringMenu ? JSON.parse(cateringMenu) : [],
       cateringminPerHead,
       cateringmaxPerHead,
-      cateringServices: {
-        sound,
-        plates,
-        seating,
-        waiters,
-        decoration,
-      },
+      cateringServices: parsedCatering,
 
       // dj fields
       djRate,
@@ -79,7 +77,7 @@ export const UploadProduct = async (req, res) => {
       photographerexpectedRange,
       adddtionalinformation,
       photographerPackage,
-      photographerPlans,
+      photographerPlans: photographerPlans ? JSON.parse(photographerPlans) : [],
       // decorator fields
       decoratorTheme,
       decoratorPrice,
