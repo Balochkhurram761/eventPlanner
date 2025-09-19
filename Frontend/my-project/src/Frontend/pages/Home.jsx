@@ -8,6 +8,7 @@ import HeroSection5 from "../components/HeroSection/HeroSection5";
 import HeroSection6 from "../components/HeroSection/HeroSection6";
 import HeroSection7 from "../components/HeroSection/HeroSection7";
 import HeroBanner from "../components/HeroSection/HeroBanner";
+import HeroSection8 from "../components/HeroSection/HeroSection8";
 
 const Home = () => {
   return (
@@ -21,6 +22,7 @@ const Home = () => {
       <HeroBanner />
       <HeroSection5 />
       <HeroSection6 />
+      <HeroSection8 />
       <HeroSection7 />
     </>
   );

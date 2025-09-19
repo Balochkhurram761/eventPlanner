@@ -8,7 +8,8 @@ const FilterBox = ({ onSearch }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSearch({ username, location, enablePrice, maxPrice });
+    const filters = { username, location, enablePrice, maxPrice };
+    if (onSearch) onSearch(filters);
   };
 
   return (
@@ -19,7 +20,7 @@ const FilterBox = ({ onSearch }) => {
 
       <form
         onSubmit={handleSubmit}
-        className="grid grid-cols-1 border-[#94624b] outline-none md:grid-cols-5 gap-4 items-center"
+        className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center"
       >
         {/* Vendor Name */}
         <input
@@ -38,15 +39,16 @@ const FilterBox = ({ onSearch }) => {
         >
           <option value="All">Select Location</option>
           <option value="lahore">Lahore</option>
-          <option value="Karachi">Karachi</option>
-          <option value="Islamabad">Islamabad</option>
+          <option value="karachi">Karachi</option>
+          <option value="islamabad">Islamabad</option>
         </select>
 
-        <div className="flex items-center gap-2 outline-none">
+        {/* Enable Price */}
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setEnablePrice(!enablePrice)}
-            className={`px-3 py-1 outline-none rounded-md text-sm ${
+            className={`px-3 py-1 rounded-md text-sm ${
               enablePrice
                 ? "bg-[#94624b] text-white"
                 : "bg-gray-200 text-gray-700"

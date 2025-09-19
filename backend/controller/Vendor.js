@@ -16,7 +16,7 @@ export const UploadProduct = async (req, res) => {
       cateringMenu,
       cateringminPerHead,
       cateringmaxPerHead,
-      cateringServices,
+
       // dj
       djRate,
       djDuration,
@@ -25,32 +25,31 @@ export const UploadProduct = async (req, res) => {
       photographerexpectedRange,
       adddtionalinformation,
       photographerPackage,
-      photographerPlans,
+
       // decorators
-      decoratorTheme,
-      decoratorPrice,
+
+      decoratorminPrice,
+      decoratormaxPrice,
+      decorationtype,
       // car rental
       carType,
       carRentalPrice,
       carRentalDuration,
       Seats,
       Door,
+      detailsproduct,
       Transmission,
       // general
       cancellation,
       staff,
       city,
+       ratings,
       contactNumber,
     } = req.body;
 
     const userId = req.user._id;
     console.log("token id ", userId);
-    let parsedCatering = cateringServices ? JSON.parse(cateringServices) : {};
-    Object.keys(parsedCatering).forEach((key) => {
-      if (parsedCatering[key] === "" || parsedCatering[key] === undefined) {
-        parsedCatering[key] = false; // ya null rakhna hai to null
-      }
-    });
+
     const newVendor = new Vendor({
       user: userId,
       serviceType,
@@ -66,7 +65,6 @@ export const UploadProduct = async (req, res) => {
       cateringMenu: cateringMenu ? JSON.parse(cateringMenu) : [],
       cateringminPerHead,
       cateringmaxPerHead,
-      cateringServices: parsedCatering,
 
       // dj fields
       djRate,
@@ -77,10 +75,11 @@ export const UploadProduct = async (req, res) => {
       photographerexpectedRange,
       adddtionalinformation,
       photographerPackage,
-      photographerPlans: photographerPlans ? JSON.parse(photographerPlans) : [],
+
       // decorator fields
-      decoratorTheme,
-      decoratorPrice,
+      decoratorminPrice,
+      decoratormaxPrice,
+      decorationtype,
       carType,
       carRentalPrice,
       carRentalDuration,
@@ -88,7 +87,9 @@ export const UploadProduct = async (req, res) => {
       Door,
       Transmission,
       cancellation,
+      detailsproduct: detailsproduct ? JSON.parse(detailsproduct) : [],
       staff,
+      ratings,
       city,
       contactNumber,
     });

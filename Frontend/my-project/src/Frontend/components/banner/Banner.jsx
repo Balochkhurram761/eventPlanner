@@ -17,9 +17,8 @@ const HeroSection = () => {
     e.preventDefault();
 
     // Optional: fetch data before navigating
-     await fetchProducts(filter);
-   
-   
+    await fetchProducts(filter);
+
     const params = new URLSearchParams();
     if (filter.username) params.append("username", filter.username);
     if (filter.serviceType) params.append("serviceType", filter.serviceType);
@@ -58,9 +57,10 @@ const HeroSection = () => {
               <option value="">Select Category</option>
               <option value="hall">Venue</option>
               <option value="catering">Catering</option>
-              <option value="photography">Photography</option>
-              <option value="dJ">DJ</option>
+              <option value="photographers">Photography</option>
+              <option value="dj">DJ</option>
               <option value="carRental">carRental</option>
+              <option value="decorators">Decorators</option>
             </select>
 
             <select

@@ -66,15 +66,6 @@ const VendorSchema = new mongoose.Schema(
       required: true,
     },
 
-    // 🍽️ Catering specific
-    cateringMenu: [
-    {
-      title: { type: String, required: true }, 
-      price: { type: Number, required: true },   
-      details: [{ type: String }],              
-    },
-  ],
-
     cateringminPerHead: {
       type: Number,
       required: function () {
@@ -135,30 +126,21 @@ const VendorSchema = new mongoose.Schema(
         return this.serviceType === "photographers";
       },
     },
-    photographerPlans: [
-      {
-        title: { type: String, required: true },
-        price: { type: Number, required: true },
 
-        deliverables: {
-          event: [{ type: String }], // e.g. "1 Day Event - Team Coverage"
-          photography: [{ type: String }], // e.g. "1 Event Album (100 photos)"
-          team: [{ type: String }], // e.g. "2 Photographer, 2 Videographer"
-          videography: [{ type: String }], // e.g. "1 Long Video (20-50 mins)"
-        },
-      },
-    ],
-
-    decoratorTheme: {
-      type: String, // e.g. "Floral Theme"
+    decorationtype: {
+      type: String,
       required: function () {
         return this.serviceType === "decorators";
       },
     },
-    decoratorPrice: {
+    decoratorminPrice: {
       type: Number,
-      min: 10000,
-      max: 1000000,
+      required: function () {
+        return this.serviceType === "decorators";
+      },
+    },
+    decoratormaxPrice: {
+      type: Number,
       required: function () {
         return this.serviceType === "decorators";
       },
@@ -185,7 +167,7 @@ const VendorSchema = new mongoose.Schema(
       },
     },
     carRentalDuration: {
-      type: String, // e.g. "Per Hour", "Per Day"
+      type: String,
       required: function () {
         return this.serviceType === "carRental";
       },
@@ -208,6 +190,19 @@ const VendorSchema = new mongoose.Schema(
         return this.serviceType === "carRental";
       },
     },
+    detailsproduct: [
+      {
+        title: { type: String, required: true },
+        price: { type: Number, required: true },
+
+        details: [
+          {
+            title: { type: String },
+            description: [{ type: String }],
+          },
+        ],
+      },
+    ],
     ratings: {
       type: Number,
       min: 0,

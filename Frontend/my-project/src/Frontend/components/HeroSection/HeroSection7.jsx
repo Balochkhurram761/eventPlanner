@@ -76,7 +76,7 @@ const HeroSection7 = () => {
                   <div className="p-4 flex flex-col gap-2">
                     <h3 className="text-lg  font-semibold">{item.title}</h3>
                     <p className="text-[#777] flex items-center  gap-0.5">
-                      <MdOutlineStar />
+                      <MdOutlineStar className="text-red-500" />
                       {item.ratings} (100)
                     </p>
                   </div>

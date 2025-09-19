@@ -13,6 +13,7 @@ import LayoutDashboardVd from "./Dashboard/vendor/layout/LayoutVendor";
 import VendorProduct from "./Dashboard/vendor/pages/VendorProduct";
 import ProductUI from "./Frontend/components/ProductUi/ProductUi";
 import ProductUiDesc from "./Frontend/components/ProductUiDesc/ProductUiDesc";
+import BookEvent1 from "./Frontend/components/bookEvent/BookEvent1";
 const App = () => {
   return (
     <Routes>
@@ -23,6 +24,7 @@ const App = () => {
         <Route path="/:serviceType/:id" element={<ProductUiDesc />} />
         <Route path="/:serviceType/:venue" element={<ProductUI />} />
         <Route path="/:serviceType" element={<ProductUI />} />
+        <Route path="/bookevent" element={<BookEvent1 />} />
 
         <Route path="register" element={<Register />} />
         <Route path="login" element={<Login />} />

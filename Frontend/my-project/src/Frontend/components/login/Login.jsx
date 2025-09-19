@@ -57,7 +57,7 @@ const Login = () => {
           {/* Heading */}
           <div className="text-center mb-6">
             <h1 className="text-3xl font-semibold text-gray-800">
-              Welcome Back 👋
+              Welcome Back
             </h1>
             <p className="text-gray-500 mt-2">
               Login to continue to your account
@@ -95,7 +95,7 @@ const Login = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-3 rounded-lg shadow-md font-medium hover:bg-blue-700 transition-all"
+              className="w-full cursor-pointer bg-blue-600 text-white py-3 rounded-lg shadow-md font-medium hover:bg-blue-700 transition-all"
             >
               Login
             </button>

@@ -15,6 +15,7 @@ import {
 } from "../controller/Vendor.js";
 import { authorizeRoles, tokenverify } from "../middleware/AuthMiddleWares.js";
 import { upload } from "../middleware/UploadMiddleWare.js";
+import { createBooking } from "../controller/BookingController.js";
 
 const router = express.Router();
 
@@ -67,5 +68,9 @@ router.put(
 
 router.get("/getdata", getdata);
 router.get("/getsingle/:id", getone);
+
+//booking api backend
+
+router.post("/bookevent", createBooking);
 
 export default router;

@@ -12,7 +12,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const UploadProduct = () => {
   const { searchQuery, setSearchQuery, products, setProducts } = useProduct();
 
-  const [filed, setFiled] = useState("hall");
+  const [field, setFiled] = useState("hall");
   const [open, setOpen] = useState(false);
 
   const initialForm = {
@@ -23,33 +23,51 @@ const UploadProduct = () => {
     hallCapacity: "",
     hallPricePerHead: "",
     Location: "",
-    cateringMenu: [],
+    cateringServices: {
+      sound: "",
+      plates: "",
+      seating: "",
+      waiters: "",
+      decoration: "",
+    },
     cateringminPerHead: "",
     cateringmaxPerHead: "",
-    cateringServices: {},
     djRate: "",
     djDuration: "",
     venue: "",
     photographerPackage: "",
     photographerStartingRange: "",
     photographerexpectedRange: "",
-    photographerPlans: [],
-
     adddtionalinformation: "",
     photographerPrice: "",
-    decoratorTheme: "",
-    decoratorPrice: "",
+    decoratorminPrice: "",
+    decoratormaxPrice: "",
+    decorationtype: "",
     carType: "",
     carRentalPrice: "",
     carRentalDuration: "",
     Seats: "",
     Door: "",
+    detailsproduct: [
+      {
+        title: "",
+        price: "",
+        details: [
+          {
+            title: "",
+            description: [""],
+          },
+        ],
+      },
+    ],
     Transmission: "",
     cancellation: "",
     staff: [],
     city: "",
+    ratings: "",
     contactNumber: "",
   };
+
   const [productForm, setProductForm] = useState(initialForm);
   const handleform = (e, extra = {}) => {
     const { name, value, type } = e.target || {};
@@ -67,117 +85,95 @@ const UploadProduct = () => {
         };
       }
 
-      if (extra.type === "photographerPlan") {
+      if (extra.type === "detailsproduct") {
         const { index } = extra;
-        const plans = [...prev.photographerPlans];
-        plans[index][name] = value;
-        updated.photographerPlans = plans;
-      }
-      if (extra.type === "catering") {
-        updated.cateringServices = {
-          ...prev.cateringServices,
-          [name]: value === "true" ? true : value === "false" ? false : null,
-        };
+        const themes = [...prev.detailsproduct];
+        themes[index][name] = value;
+        updated.detailsproduct = themes;
       }
 
-      if (extra.type === "deliverable") {
-        const { index, key, subIndex } = extra;
-        const plans = [...prev.photographerPlans];
-        plans[index].deliverables[key][subIndex] = value;
-        updated.photographerPlans = plans;
+      if (extra.type === "decorationDetail") {
+        const { index, subIndex, field } = extra;
+        const themes = [...prev.detailsproduct];
+        themes[index].details[subIndex][field] = value;
+        updated.detailsproduct = themes;
       }
-
-      if (extra.type === "cateringMenu") {
-        const { index } = extra;
-        const menus = [...prev.cateringMenu];
-        menus[index][name] = value;
-        updated.cateringMenu = menus;
-      }
-
-      if (extra.type === "cateringDetails") {
-        const { index, subIndex } = extra;
-        const menus = [...prev.cateringMenu];
-        menus[index].details[subIndex] = value;
-        updated.cateringMenu = menus;
+      if (extra.type === "descriptionArray") {
+        const { index, subIndex, descIndex, value } = extra;
+        const themes = [...prev.detailsproduct];
+        themes[index].details[subIndex].description[descIndex] = value;
+        updated.detailsproduct = themes;
       }
 
       return updated;
     });
   };
 
-  // Photographer Plan Functions
-  const addPhotographerPlan = () => {
+  const addSubDetail = (index) => {
+    setProductForm((prev) => {
+      const themes = [...prev.detailsproduct];
+      themes[index].details.push({ title: "", description: [""] });
+      return { ...prev, detailsproduct: themes };
+    });
+  };
+
+  // ✅ Remove sub detail
+  const removeSubDetail = (index, subIndex) => {
+    setProductForm((prev) => {
+      const themes = [...prev.detailsproduct];
+      themes[index].details = themes[index].details.filter(
+        (_, i) => i !== subIndex
+      );
+      return { ...prev, detailsproduct: themes };
+    });
+  };
+
+  // ✅ Add Item
+  const addDetailsProduct = () => {
     setProductForm((prev) => ({
       ...prev,
-      photographerPlans: [
-        ...prev.photographerPlans,
+      detailsproduct: [
+        ...prev.detailsproduct,
         {
           title: "",
           price: "",
-          deliverables: { event: [""], photography: [""] },
+          details: [
+            {
+              title: "",
+              description: [""],
+            },
+          ],
         },
       ],
     }));
   };
 
-  const removePhotographerPlan = (index) => {
-    setProductForm((prev) => ({
-      ...prev,
-      photographerPlans: prev.photographerPlans.filter((_, i) => i !== index),
-    }));
-  };
-
-  const addDeliverable = (planIndex, key) => {
+  // ✅ Remove Item
+  const removeDetailsProduct = (index) => {
     setProductForm((prev) => {
-      const plans = [...prev.photographerPlans];
-      plans[planIndex].deliverables[key].push("");
-      return { ...prev, photographerPlans: plans };
+      const updated = [...prev.detailsproduct];
+      updated.splice(index, 1);
+      return { ...prev, detailsproduct: updated };
     });
   };
 
-  const removeDeliverable = (planIndex, key, subIndex) => {
+  // ✅ Add Description
+  const addDescription = (index, subIndex) => {
     setProductForm((prev) => {
-      const plans = [...prev.photographerPlans];
-      plans[planIndex].deliverables[key] = plans[planIndex].deliverables[
-        key
-      ].filter((_, i) => i !== subIndex);
-      return { ...prev, photographerPlans: plans };
+      const themes = [...prev.detailsproduct];
+      themes[index].details[subIndex].description.push("");
+      return { ...prev, detailsproduct: themes };
     });
   };
 
-  // Catering Menu Functions
-  const addCateringMenu = () => {
-    setProductForm((prev) => ({
-      ...prev,
-      cateringMenu: [
-        ...prev.cateringMenu,
-        { title: "", price: "", details: [""] },
-      ],
-    }));
-  };
-
-  const removeCateringMenu = (index) => {
-    setProductForm((prev) => ({
-      ...prev,
-      cateringMenu: prev.cateringMenu.filter((_, i) => i !== index),
-    }));
-  };
-
-  const addCateringDetail = (menuIndex) => {
+  // ✅ Remove Description
+  const removeDescription = (index, subIndex, descIndex) => {
     setProductForm((prev) => {
-      const menus = [...prev.cateringMenu];
-      menus[menuIndex].details.push("");
-      return { ...prev, cateringMenu: menus };
-    });
-  };
-
-  const removeCateringDetail = (menuIndex, detailIndex) => {
-    setProductForm((prev) => {
-      const menus = [...prev.cateringMenu];
-      menus[menuIndex].details = menus[menuIndex].details.filter(
-        (_, i) => i !== detailIndex
-      );
-      return { ...prev, cateringMenu: menus };
+      const themes = [...prev.detailsproduct];
+      themes[index].details[subIndex].description = themes[index].details[
+        subIndex
+      ].description.filter((_, i) => i !== descIndex);
+      return { ...prev, detailsproduct: themes };
     });
   };
 
@@ -215,12 +211,8 @@ const UploadProduct = () => {
           value.forEach((file) => formData.append("images", file));
         } else if (key === "cateringServices") {
           formData.append("cateringServices", JSON.stringify(value));
-        } else if (key === "photographerPlans") {
-          formData.append("photographerPlans", JSON.stringify(value));
         } else if (Array.isArray(value)) {
           formData.append(key, JSON.stringify(value));
-        } else if (key === "cateringMenu") {
-          formData.append("cateringMenu", JSON.stringify(value));
         } else {
           formData.append(key, value);
         }
@@ -378,9 +370,8 @@ const UploadProduct = () => {
           </h2>
           <form className="flex flex-col gap-4" onSubmit={uploadproduct}>
             {/* Service Type */}
-
             <select
-              value={filed}
+              value={field}
               onChange={(e) => roleChange(e.target.value)}
               className="border rounded-lg p-2 outline-none"
             >
@@ -408,6 +399,14 @@ const UploadProduct = () => {
               placeholder="Description"
               className="border rounded-lg p-2 outline-none resize-none"
               rows={3}
+            />
+            <input
+              type="text"
+              onChange={handleform}
+              name="adddtionalinformation"
+              value={productForm.adddtionalinformation}
+              placeholder="Additional Information"
+              className="border rounded-lg p-2 outline-none"
             />
 
             {/* Image uploader */}
@@ -441,7 +440,7 @@ const UploadProduct = () => {
             </div>
 
             {/* Hall fields */}
-            {filed === "hall" && (
+            {field === "hall" && (
               <>
                 <input
                   type="text"
@@ -467,102 +466,23 @@ const UploadProduct = () => {
                   className="border rounded-lg p-2 outline-none"
                 >
                   <option value="">Select Venue</option>
-                  <option value="BanquetHall">BanquetHall</option>
-                  <option value="OutdoorGarden">OutdoorGarden</option>
+                  <option value="BanquetHall">Banquet Hall</option>
+                  <option value="OutdoorGarden">Outdoor Garden</option>
                   <option value="Resort">Resort</option>
                 </select>
               </>
             )}
 
             {/* Catering fields */}
-            {filed === "catering" && (
+            {field === "catering" && (
               <>
-                <div>
-                  <h3 className="font-bold">Catering Menu</h3>
-                  {productForm.cateringMenu.map((menu, index) => (
-                    <div key={index} className="border p-3 rounded mb-2">
-                      <input
-                        type="text"
-                        name="title"
-                        placeholder="Menu Title"
-                        value={menu.title}
-                        onChange={(e) =>
-                          handleform(e, { type: "cateringMenu", index })
-                        }
-                        className="border rounded-lg p-2 w-full outline-none"
-                      />
-                      <input
-                        type="number"
-                        name="price"
-                        placeholder="Price"
-                        value={menu.price}
-                        onChange={(e) =>
-                          handleform(e, { type: "cateringMenu", index })
-                        }
-                        className="border rounded-lg p-2 w-full outline-none mt-2"
-                      />
-
-                      {/* Details */}
-                      {menu.details.map((d, subIndex) => (
-                        <div
-                          key={subIndex}
-                          className="flex items-center gap-2 mt-2"
-                        >
-                          <input
-                            type="text"
-                            value={d}
-                            onChange={(e) =>
-                              handleform(e, {
-                                type: "cateringDetails",
-                                index,
-                                subIndex,
-                              })
-                            }
-                            className="border rounded-lg p-2 w-full outline-none"
-                          />
-                          <button
-                            type="button"
-                            onClick={() =>
-                              removeCateringDetail(index, subIndex)
-                            }
-                            className="text-red-500"
-                          >
-                            X
-                          </button>
-                        </div>
-                      ))}
-                      <button
-                        type="button"
-                        onClick={() => addCateringDetail(index)}
-                        className="text-blue-500 mt-1"
-                      >
-                        + Add Detail
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => removeCateringMenu(index)}
-                        className="bg-red-500 text-white px-2 py-1 rounded mt-2"
-                      >
-                        Remove Menu
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={addCateringMenu}
-                    className="bg-green-500 text-white px-4 py-2 rounded"
-                  >
-                    + Add Menu
-                  </button>
-                </div>
-
+                <h3 className="font-bold">Catering Menu</h3>
                 <input
                   type="text"
                   onChange={handleform}
                   name="cateringminPerHead"
                   value={productForm.cateringminPerHead}
-                  placeholder="Catering min Price Per Head"
+                  placeholder="Catering Min Price Per Head"
                   className="border rounded-lg p-2 outline-none"
                 />
                 <input
@@ -570,70 +490,74 @@ const UploadProduct = () => {
                   onChange={handleform}
                   name="cateringmaxPerHead"
                   value={productForm.cateringmaxPerHead}
-                  placeholder="Catering max Price Per Head"
+                  placeholder="Catering Max Price Per Head"
                   className="border rounded-lg p-2 outline-none"
                 />
-                <label htmlFor="">Sounds</label>
+                <label htmlFor="">Sounds</label>{" "}
                 <select
                   name="sound"
-                  value={productForm.cateringServices.sound}
-                  onChange={handleform}
+                  value={productForm.cateringServices.sound || ""}
+                  onChange={(e) => handleform(e, { type: "catering" })}
                   id=""
                 >
-                  <option value="">Option Select</option>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </select>
-                <label htmlFor="">Plates</label>
+                  {" "}
+                  <option value="">Option Select</option>{" "}
+                  <option value="true">Yes</option>{" "}
+                  <option value="false">No</option>{" "}
+                </select>{" "}
+                <label htmlFor="">Plates</label>{" "}
                 <select
                   name="plates"
-                  value={productForm.cateringServices.plates}
-                  onChange={handleform}
+                  value={productForm.cateringServices.plates || ""}
+                  onChange={(e) => handleform(e, { type: "catering" })}
                   id=""
                 >
-                  <option value="">Option Select</option>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </select>
-                <label htmlFor="">Seating</label>
+                  {" "}
+                  <option value="">Option Select</option>{" "}
+                  <option value="true">Yes</option>{" "}
+                  <option value="false">No</option>{" "}
+                </select>{" "}
+                <label htmlFor="">Seating</label>{" "}
                 <select
                   name="seating"
-                  value={productForm.cateringServices.seating}
-                  onChange={handleform}
+                  value={productForm.cateringServices.seating || ""}
+                  onChange={(e) => handleform(e, { type: "catering" })}
                   id=""
                 >
-                  <option value="">Option Select</option>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </select>
-                <label htmlFor="">Waiters</label>
+                  {" "}
+                  <option value="">Option Select</option>{" "}
+                  <option value="true">Yes</option>{" "}
+                  <option value="false">No</option>{" "}
+                </select>{" "}
+                <label htmlFor="">Waiters</label>{" "}
                 <select
                   name="waiters"
-                  value={productForm.cateringServices.waiters}
-                  onChange={handleform}
+                  value={productForm.cateringServices.waiters || ""}
+                  onChange={(e) => handleform(e, { type: "catering" })}
                   id=""
                 >
-                  <option value="">Option Select</option>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </select>
-                <label htmlFor="">Decoration</label>
+                  {" "}
+                  <option value="">Option Select</option>{" "}
+                  <option value="true">Yes</option>{" "}
+                  <option value="false">No</option>{" "}
+                </select>{" "}
+                <label htmlFor="">Decoration</label>{" "}
                 <select
                   name="decoration"
-                  onChange={handleform}
-                  value={productForm.cateringServices.decoration}
+                  value={productForm.cateringServices.decoration || ""}
+                  onChange={(e) => handleform(e, { type: "catering" })}
                   id=""
                 >
-                  <option value="">Option Select</option>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
+                  <option value="">Option Select</option>{" "}
+                  <option value="true">Yes</option>{" "}
+                  <option value="false">No</option>{" "}
                 </select>
                 <input
                   type="text"
                   onChange={handleform}
                   name="cancellation"
                   value={productForm.cancellation}
-                  placeholder="Catering cancellation"
+                  placeholder="Catering Cancellation Policy"
                   className="border rounded-lg p-2 outline-none"
                 />
                 <input
@@ -653,7 +577,7 @@ const UploadProduct = () => {
             )}
 
             {/* DJ fields */}
-            {filed === "dj" && (
+            {field === "dj" && (
               <>
                 <input
                   type="text"
@@ -673,7 +597,9 @@ const UploadProduct = () => {
                 />
               </>
             )}
-            {filed === "photographers" && (
+
+            {/* Photographers fields */}
+            {field === "photographers" && (
               <>
                 <input
                   type="text"
@@ -688,7 +614,7 @@ const UploadProduct = () => {
                   onChange={handleform}
                   name="photographerStartingRange"
                   value={productForm.photographerStartingRange}
-                  placeholder="Photographer started Price"
+                  placeholder="Photographer Starting Price"
                   className="border rounded-lg p-2 outline-none"
                 />
                 <input
@@ -696,20 +622,19 @@ const UploadProduct = () => {
                   onChange={handleform}
                   name="photographerexpectedRange"
                   value={productForm.photographerexpectedRange}
-                  placeholder="Photographer expected Price"
+                  placeholder="Photographer Expected Price"
                   className="border rounded-lg p-2 outline-none"
                 />
-
-                {/* Catering Services Checkboxes */}
 
                 <input
                   type="text"
                   onChange={handleform}
                   name="cancellation"
                   value={productForm.cancellation}
-                  placeholder="Decorator cancellation"
+                  placeholder="Photographer Cancellation Policy"
                   className="border rounded-lg p-2 outline-none"
                 />
+
                 <input
                   type="text"
                   onChange={(e) => {
@@ -723,124 +648,34 @@ const UploadProduct = () => {
                   placeholder="Enter staff (e.g. Male, Female)"
                   className="border rounded-lg p-2 outline-none"
                 />
-                <input
-                  type="text"
-                  onChange={handleform}
-                  name="adddtionalinformation"
-                  value={productForm.adddtionalinformation}
-                  placeholder="addtionalinformatio"
-                  className="border rounded-lg p-2 outline-none"
-                />
-                {productForm.photographerPlans.map((plan, index) => (
-                  <div
-                    key={index}
-                    className="border rounded-lg p-4 space-y-3 bg-gray-50 mt-3"
-                  >
-                    <div className="flex justify-between items-center">
-                      <h3 className="font-semibold">Plan {index + 1}</h3>
-                      <button
-                        type="button"
-                        onClick={() => removePhotographerPlan(index)}
-                        className="text-red-600 text-sm"
-                      >
-                        Remove
-                      </button>
-                    </div>
-
-                    <input
-                      type="text"
-                      name="title"
-                      placeholder="Plan Title"
-                      value={plan.title}
-                      onChange={(e) =>
-                        handleform(e, { type: "photographerPlan", index })
-                      }
-                      className="border p-2 rounded-lg w-full"
-                    />
-                    <input
-                      type="number"
-                      name="price"
-                      placeholder="Plan Price"
-                      value={plan.price}
-                      onChange={(e) =>
-                        handleform(e, { type: "photographerPlan", index })
-                      }
-                      className="border p-2 rounded-lg w-full"
-                    />
-
-                    {["event", "photography", "team", "videography"].map(
-                      (key) => (
-                        <div key={key}>
-                          <label className="font-medium capitalize">
-                            {key} Deliverables
-                          </label>
-                          {plan.deliverables[key].map((item, subIndex) => (
-                            <div
-                              key={subIndex}
-                              className="flex items-center gap-2 mt-1"
-                            >
-                              <input
-                                type="text"
-                                value={item}
-                                onChange={(e) =>
-                                  handleform(e, {
-                                    type: "deliverable",
-                                    index,
-                                    key,
-                                    subIndex,
-                                  })
-                                }
-                                className="border p-2 rounded-lg flex-1"
-                              />
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  removeDeliverable(index, key, subIndex)
-                                }
-                                className="text-red-500"
-                              >
-                                ✕
-                              </button>
-                            </div>
-                          ))}
-                          <button
-                            type="button"
-                            onClick={() => addDeliverable(index, key)}
-                            className="text-blue-600 text-sm mt-1"
-                          >
-                            + Add {key}
-                          </button>
-                        </div>
-                      )
-                    )}
-                  </div>
-                ))}
-
-                <button
-                  type="button"
-                  onClick={addPhotographerPlan}
-                  className="bg-blue-100 text-blue-700 px-3 py-2 rounded-lg mt-3"
-                >
-                  + Add More Plan
-                </button>
               </>
             )}
-            {filed === "decorators" && (
+
+            {/* Decorators fields */}
+            {field === "decorators" && (
               <>
                 <input
                   type="text"
                   onChange={handleform}
-                  name="decoratorTheme"
-                  value={productForm.decoratorTheme}
-                  placeholder="DecoratorTheme"
+                  name="decorationtype"
+                  value={productForm.decorationtype}
+                  placeholder="Decorator Type"
                   className="border rounded-lg p-2 outline-none"
                 />
                 <input
-                  type="text"
+                  type="number"
                   onChange={handleform}
-                  name="decoratorPrice"
-                  value={productForm.decoratorPrice}
-                  placeholder="Decorator Price"
+                  name="decoratorminPrice"
+                  value={productForm.decoratorminPrice}
+                  placeholder="Decorator Min Price"
+                  className="border rounded-lg p-2 outline-none"
+                />
+                <input
+                  type="number"
+                  onChange={handleform}
+                  name="decoratormaxPrice"
+                  value={productForm.decoratormaxPrice}
+                  placeholder="Decorator Max Price"
                   className="border rounded-lg p-2 outline-none"
                 />
                 <input
@@ -848,7 +683,7 @@ const UploadProduct = () => {
                   onChange={handleform}
                   name="cancellation"
                   value={productForm.cancellation}
-                  placeholder="Decorator cancellation"
+                  placeholder="Decorator Cancellation Policy"
                   className="border rounded-lg p-2 outline-none"
                 />
                 <input
@@ -866,7 +701,9 @@ const UploadProduct = () => {
                 />
               </>
             )}
-            {filed === "carRental" && (
+
+            {/* Car Rental fields */}
+            {field === "carRental" && (
               <>
                 <input
                   type="text"
@@ -881,7 +718,7 @@ const UploadProduct = () => {
                   onChange={handleform}
                   name="carRentalPrice"
                   value={productForm.carRentalPrice}
-                  placeholder="CarRental Price"
+                  placeholder="Car Rental Price"
                   className="border rounded-lg p-2 outline-none"
                 />
                 <input
@@ -889,7 +726,7 @@ const UploadProduct = () => {
                   onChange={handleform}
                   name="carRentalDuration"
                   value={productForm.carRentalDuration}
-                  placeholder="CarRentalDuration"
+                  placeholder="Car Rental Duration"
                   className="border rounded-lg p-2 outline-none"
                 />
                 <input
@@ -905,7 +742,7 @@ const UploadProduct = () => {
                   onChange={handleform}
                   name="Door"
                   value={productForm.Door}
-                  placeholder="Enter total Door in Car"
+                  placeholder="Enter Total Doors in Car"
                   className="border rounded-lg p-2 outline-none"
                 />
                 <input
@@ -913,11 +750,130 @@ const UploadProduct = () => {
                   onChange={handleform}
                   name="Transmission"
                   value={productForm.Transmission}
-                  placeholder="Enter Auto/ Manual"
+                  placeholder="Enter Auto/Manual"
                   className="border rounded-lg p-2 outline-none"
                 />
               </>
             )}
+            <h3 className="font-bold">Details</h3>
+            {productForm.detailsproduct.map((item, index) => (
+              <div
+                key={index}
+                className="border p-3 rounded-lg mb-3 bg-gray-50"
+              >
+                <input
+                  type="text"
+                  placeholder="Title"
+                  name="title"
+                  value={item.title}
+                  onChange={(e) =>
+                    handleform(e, { type: "detailsproduct", index })
+                  }
+                  className="border rounded p-2 w-full mb-2"
+                />
+                <input
+                  type="number"
+                  placeholder="Price"
+                  name="price"
+                  value={item.price}
+                  onChange={(e) =>
+                    handleform(e, { type: "detailsproduct", index })
+                  }
+                  className="border rounded p-2 w-full mb-2"
+                />
+                <h4 className="font-medium">Sub Details</h4>
+                {item.details.map((d, subIndex) => (
+                  <div key={subIndex} className="border p-2 rounded mb-2">
+                    <input
+                      type="text"
+                      placeholder="Sub Title"
+                      value={d.title}
+                      onChange={(e) =>
+                        handleform(e, {
+                          type: "decorationDetail",
+                          index,
+                          subIndex,
+                          field: "title",
+                        })
+                      }
+                      className="border rounded p-2 w-full mb-2"
+                    />
+
+                    <h5 className="font-medium">Descriptions</h5>
+                    {d.description.map((desc, descIndex) => (
+                      <div key={descIndex} className="flex gap-2 mb-2">
+                        <input
+                          type="text"
+                          value={desc}
+                          placeholder={`Description ${descIndex + 1}`}
+                          onChange={(e) =>
+                            handleform(e, {
+                              type: "descriptionArray",
+                              index,
+                              subIndex,
+                              descIndex,
+                              value: e.target.value,
+                            })
+                          }
+                          className="border rounded p-2 flex-1"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            removeDescription(index, subIndex, descIndex)
+                          }
+                          className="px-2 bg-red-500 cursor-pointer text-white rounded"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+
+                    <button
+                      type="button"
+                      onClick={() => addDescription(index, subIndex)}
+                      className="px-3 py-1 cursor-pointer bg-green-500 text-white rounded text-sm"
+                    >
+                      Add Description
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => removeSubDetail(index, subIndex)}
+                      className="ml-2 cursor-pointer px-3 py-1 bg-red-500 text-white rounded text-sm"
+                    >
+                      Remove Sub Detail
+                    </button>
+                  </div>
+                ))}
+
+                {/* 👉 Add Subtitle button yaha aayega */}
+                <button
+                  type="button"
+                  onClick={() => addSubDetail(index)}
+                  className="mt-2 cursor-pointer px-3 py-1 bg-blue-500 text-white rounded text-sm"
+                >
+                  Add Subtitle
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => removeDetailsProduct(index)}
+                  className="ml-2 px-3  cursor-pointer  py-1 bg-red-600 text-white rounded text-sm"
+                >
+                  Remove Item
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addDetailsProduct}
+              className="px-4 py-2 cursor-pointer  bg-blue-600 text-white rounded mt-2"
+            >
+              Add Item
+            </button>
+
+            {/* Common Fields */}
             <input
               type="text"
               onChange={handleform}
@@ -934,13 +890,20 @@ const UploadProduct = () => {
               className="border rounded-lg p-2 outline-none resize-none"
               rows={3}
             />
-
             <input
               type="text"
               onChange={handleform}
               name="city"
               value={productForm.city}
               placeholder="Enter City"
+              className="border rounded-lg p-2 outline-none"
+            />
+            <input
+              type="number"
+              onChange={handleform}
+              name="ratings"
+              value={productForm.ratings}
+              placeholder="Enter ratings point"
               className="border rounded-lg p-2 outline-none"
             />
 

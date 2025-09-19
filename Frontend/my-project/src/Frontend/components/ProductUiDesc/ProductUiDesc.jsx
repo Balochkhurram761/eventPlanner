@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { IoLocationSharp } from "react-icons/io5";
 import { MdOutlineAirlineSeatReclineNormal } from "react-icons/md";
 import { GiCarDoor } from "react-icons/gi";
@@ -9,28 +9,26 @@ import { FaUser } from "react-icons/fa";
 import { MdPolicy } from "react-icons/md";
 import { AiFillExperiment } from "react-icons/ai";
 import { BiSolidHourglassTop } from "react-icons/bi";
-import { TfiGallery } from "react-icons/tfi";
-import { FaCamera } from "react-icons/fa";
-import { TiUserAdd } from "react-icons/ti";
-import { IoVideocam } from "react-icons/io5";
 import { FaUtensils, FaChair, FaUserTie } from "react-icons/fa";
 import { MdCelebration } from "react-icons/md";
 import { FaMusic } from "react-icons/fa";
-import { FaUsers, FaCalendarAlt } from "react-icons/fa";
-import { MdAttachMoney } from "react-icons/md";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { BsBuildingFillAdd } from "react-icons/bs";
+import { IoLocation } from "react-icons/io5";
+import { FaPhoneAlt } from "react-icons/fa";
+
 const ProductUiDesc = () => {
   const { id } = useParams();
   const [selectedImage, setSelectedImage] = useState("");
-  const [selectedPlan, setSelectedPlan] = useState(0);
-  const [guests, setGuests] = useState(1);
-  const [selectedDate, setSelectedDate] = useState(null);
-
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [persons, setPersons] = useState(120);
+  const [eventDate, setEventDate] = useState("");
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const navigate = useNavigate();
+  const handlenavigate = (product) => {
+    navigate("/bookevent", { state: { product } });
+  };
   const getData = async () => {
     try {
       const res = await axios.get(
@@ -49,629 +47,651 @@ const ProductUiDesc = () => {
   }, [id]);
 
   if (loading) {
-    return <div className="text-center py-10">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        Loading...
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center py-10 text-red-500">{error}</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen text-red-500">
+        {error}
+      </div>
+    );
   }
 
   if (!product) {
-    return <div className="text-center py-10">No product found</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        No product found
+      </div>
+    );
   }
 
-  return (
-    <div className="bg bg-gray-100">
-      <div className="w-[100%] mx-auto p-6 space-y-8  min-h-screen">
-        {/* Top Section */}
-        <div className="grid md:grid-cols-2 gap-10 bg-white p-6 rounded-2xl shadow-md">
-          {/* Images */}
-          <div className="flex flex-row gap-3">
-            <div className="flex flex-col  gap-3 mt-4 cursor-pointer">
-              {product.images?.map((img, i) => {
-                const fullUrl = `http://localhost:5000/${img}`;
-                return (
-                  <img
-                    key={i}
-                    src={fullUrl}
-                    onClick={() => setSelectedImage(fullUrl)}
-                    alt="thumb"
-                    className={`w-20 h-20 object-cover rounded-md transition-all duration-200
-                    ${
-                      (selectedImage ||
-                        `http://localhost:5000/${product.images?.[0]}`) ===
-                      fullUrl
-                        ? "border-2 border-red-600 shadow-md scale-105"
-                        : "border border-gray-300 hover:scale-105"
-                    }`}
-                  />
-                );
-              })}
-            </div>
-            {/* Big Image */}
-            <img
-              src={
-                selectedImage || `http://localhost:5000/${product.images?.[0]}`
-              }
-              alt={product.title}
-              className="w-[90%] h-[600px] object-cover rounded-xl shadow-md"
-            />
-
-            {/* Thumbnails */}
+  // Helper function to render service-specific details
+  const renderServiceDetails = () => {
+    switch (product.serviceType) {
+      case "hall":
+        return (
+          <div className="space-y-3">
+            <p>
+              <span className="font-semibold">Venue:</span> {product.venue}
+            </p>
+            <p>
+              <span className="font-semibold">Capacity:</span>{" "}
+              {product.hallCapacity} Guests
+            </p>
+            <p>
+              <span className="font-semibold">Price / Head:</span> Rs{" "}
+              {product.hallPricePerHead}
+            </p>
+            <p>
+              <span className="font-semibold">Location:</span>{" "}
+              {product.Location}
+            </p>
           </div>
+        );
 
-          {/* Details */}
-          <div className="flex flex-col gap-6">
-            <div className="flex  flex-col gap-2">
-              <h1 className="text-4xl font-bold capitalize text-gray-900">
-                {product.title}
-              </h1>
-              <p className="mt-2 text-gray-600 flex flex-row gap-5">
-                <span className="">
-                  by
-                  <span className="text-red-500 capitalize underline  ">
-                    {" "}
-                    {product?.user.businessName}
-                  </span>
+      case "catering":
+        return (
+          <div className="space-y-6">
+            <p className="font-semibold text-2xl">
+              PKR {product.cateringminPerHead?.toLocaleString()} - PKR{" "}
+              {product.cateringmaxPerHead}
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="flex items-center gap-3">
+                <span className="text-red-500 text-2xl">
+                  <FaUser />
                 </span>
-                <span className="flex capitalize items-center gap-1 text-[16px]">
-                  <IoLocationSharp />
-                  {product.Location}
+                <div>
+                  <p className="font-medium">Staff</p>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {product.staff &&
+                      JSON.parse(product.staff).map((item, index) => (
+                        <span
+                          key={index}
+                          className="text-sm bg-gray-100 px-2 py-1 rounded capitalize"
+                        >
+                          {item}
+                        </span>
+                      ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-red-500 text-2xl">
+                  <MdPolicy />
                 </span>
-              </p>
-            </div>
-
-            <div className="">
-              {product.serviceType === "hall" && (
-                <>
-                  <p>
-                    <span className="font-semibold">Venue:</span>{" "}
-                    {product.venue}
-                  </p>
-                  <p>
-                    <span className="font-semibold">Capacity:</span>{" "}
-                    {product.hallCapacity} Guests
-                  </p>
-                  <p>
-                    <span className="font-semibold">Price / Head:</span> Rs{" "}
-                    {product.hallPricePerHead}
-                  </p>
-                  <p>
-                    <span className="font-semibold">Location:</span>{" "}
-                    {product.Location}
-                  </p>
-                </>
-              )}
-
-              {product.serviceType === "catering" && (
-                <>
-                  <div className="wrap flex flex-col gap-9">
-                    <p className="font-semibold text-2xl">
-                      <span className="">PKR</span>{" "}
-                      {product.cateringminPerHead?.toLocaleString()}-
-                      <span className="">PKR</span> {product.cateringmaxPerHead}
-                    </p>
-                    <div className="wrap flex gap-40">
-                      <p className="flex gap-2.5 items-center ">
-                        <span className="text-red-500 text-2xl ">
-                          <FaUser />
-                        </span>{" "}
-                        <div className="bd flex text-[#777] flex-col items-center">
-                          <p className="font-medium text-black">Staff</p>
-
-                          <div className="flex flex-row gap-3">
-                            {product.staff &&
-                              JSON.parse(product.staff).map((item, index) => (
-                                <span key={index} className=" py-1 capitalize">
-                                  {item}
-                                </span>
-                              ))}
-                          </div>
-                        </div>
-                      </p>
-                      <p className="flex gap-2.5 items-center">
-                        <span className="text-red-500 text-2xl ">
-                          <MdPolicy />
-                        </span>{" "}
-                        <div className="bd flex text-[#777] flex-col items-center justify-center ">
-                          <p className="font-medium text-black">
-                            {" "}
-                            Cancellation Policy
-                          </p>
-                          {product.cancellation}
-                        </div>
-                      </p>
-                    </div>
-                    <div className="cateringservice space-y-3 ">
-                      {product.cateringServices && (
-                        <ul className="space-y-10 grid ">
-                          {/* Sound */}
-                          <div className="wra flex  gap-35">
-                            <li className="flex items-center flex-col gap-3">
-                              <div className=" flex items-center  gap-2">
-                                <FaMusic className="text-orange-600 text-xl" />
-
-                                <span className="w-32 font-medium">
-                                  Provide Sound
-                                </span>
-                              </div>
-                              {product.cateringServices.sound ? (
-                                <span className="flex items-center gap-1 text-green-600">
-                                  Yes
-                                </span>
-                              ) : (
-                                <span className="flex items-center gap-1 text-red-600">
-                                  No
-                                </span>
-                              )}
-                            </li>
-
-                            {/* Plates */}
-                            <li className="flex items-center flex-col gap-3">
-                              <div className="flex  items-center gap-4">
-                                <div className="c flex gap-2 items-center">
-                                  <FaUtensils className="text-orange-600 text-xl" />
-                                  <span className="w-32 font-medium">
-                                    Provide Plates
-                                  </span>
-                                </div>
-                              </div>
-                              {product.cateringServices.plates ? (
-                                <span className="flex items-center gap-1 text-green-600">
-                                  Yes
-                                </span>
-                              ) : (
-                                <span className="flex items-center gap-1 text-red-600">
-                                  No
-                                </span>
-                              )}
-                            </li>
-                          </div>
-                          <div className="wra flex  gap-37">
-                            {/* Seating */}
-                            <li className="flex items-center flex-col gap-3">
-                              <div className="c flex gap-2 ">
-                                <FaChair className="text-orange-600 text-xl" />
-                                <span className="w-32 font-medium">
-                                  Provide Seating
-                                </span>
-                              </div>
-                              {product.cateringServices.seating ? (
-                                <span className="flex items-center gap-1 text-green-600">
-                                  Yes
-                                </span>
-                              ) : (
-                                <span className="flex items-center gap-1 text-red-600">
-                                  No
-                                </span>
-                              )}
-                            </li>
-
-                            {/* Waiters */}
-                            <li className="flex items-center flex-col gap-3">
-                              <div className="c flex items-center">
-                                <FaUserTie className="text-orange-600 text-xl" />
-                                <span className="w-32 font-medium">
-                                  Provide Waiters
-                                </span>
-                              </div>
-                              {product.cateringServices.waiters ? (
-                                <span className="flex items-center gap-1 text-green-600">
-                                  Yes
-                                </span>
-                              ) : (
-                                <span className="flex items-center gap-1 text-red-600">
-                                  No
-                                </span>
-                              )}
-                            </li>
-                          </div>
-
-                          {/* Decoration */}
-                          <div className="wra flex items-center gap-37">
-                            <li className="flex items-center flex-col gap-3">
-                              <div className="c flex items-center  gap-1.5">
-                                <MdCelebration className="text-orange-600 text-xl" />
-                                <span className="w-40 font-medium">
-                                  Provide Decoration
-                                </span>
-                              </div>
-                              {product.cateringServices.decoration ? (
-                                <span className="flex items-center gap-1 text-green-600">
-                                  Yes
-                                </span>
-                              ) : (
-                                <span className="flex items-center gap-1 text-red-600">
-                                  No
-                                </span>
-                              )}
-                            </li>
-                          </div>
-                        </ul>
-                      )}
-                    </div>
-                    <div className="desc">
-                      <p>
-                        <span className="font-bold">Description:</span>{" "}
-                        {product.description}
-                      </p>
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {product.serviceType === "dj" && (
-                <>
-                  <div className="wrap flex flex-col gap-9">
-                    <p className="font-semibold text-2xl">
-                      <span className="">PKR</span>{" "}
-                      {product.djRate?.toLocaleString()}
-                    </p>
-                    <div className="wrap flex">
-                      <p className="flex gap-2.5 ">
-                        <span className="text-red-500 text-2xl ">
-                          <BiSolidHourglassTop />
-                        </span>{" "}
-                        <div className="bd flex font-medium flex-col items-center justify-center ">
-                          <p> hours</p>
-                          {product.djDuration}
-                        </div>
-                      </p>
-                    </div>
-                    <div className="bd flex text-[#777] flex-col   ">
-                      <p className="font-medium text-black"> Description</p>
-                      {product.description}
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {product.serviceType === "photographers" && (
-                <>
-                  <div className="wrap flex flex-col gap-9">
-                    <p className="font-semibold text-2xl">
-                      <span className="">PKR</span>{" "}
-                      {product.photographerStartingRange?.toLocaleString()}-
-                      <span className="">PKR</span>{" "}
-                      {product.photographerexpectedRange}
-                    </p>
-                    <div className="wrap flex justify-around">
-                      <p className="flex gap-2 items-center  justify-start">
-                        <span className="text-red-500 text-2xl ">
-                          <AiFillExperiment />
-                        </span>{" "}
-                        <div className="bd flex text-[#777] flex-col items-center  ">
-                          <p className="font-medium text-black">Expertise</p>
-                          {product.photographerPackage}
-                        </div>
-                      </p>
-                      <p className="flex gap-2.5 items-center ">
-                        <span className="text-red-500 text-2xl ">
-                          <FaUser />
-                        </span>{" "}
-                        <div className="bd flex text-[#777] flex-col items-center">
-                          <p className="font-medium text-black">Staff</p>
-
-                          <div className="flex flex-row gap-3">
-                            {product.staff &&
-                              JSON.parse(product.staff).map((item, index) => (
-                                <span key={index} className=" py-1 capitalize">
-                                  {item}
-                                </span>
-                              ))}
-                          </div>
-                        </div>
-                      </p>
-                      <p className="flex gap-2.5 items-center">
-                        <span className="text-red-500 text-2xl ">
-                          <MdPolicy />
-                        </span>{" "}
-                        <div className="bd flex text-[#777] flex-col items-center justify-center ">
-                          <p className="font-medium text-black">
-                            {" "}
-                            cancellation Policy
-                          </p>
-                          {product.cancellation}
-                        </div>
-                      </p>
-                    </div>
-                    <div className="desc">
-                      <p>
-                        <span className="font-bold">Description:</span>{" "}
-                        {product.description}
-                      </p>
-                    </div>
-                    <div className="desc">
-                      <p>
-                        <span className="font-bold">Additonal Info:</span>{" "}
-                        {product.adddtionalinformation}
-                      </p>
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {product.serviceType === "decorators" && (
-                <>
-                  <p>
-                    <span className="font-semibold">Theme:</span>{" "}
-                    {product.decoratorTheme}
-                  </p>
-                  <p>
-                    <span className="font-semibold">Price:</span> Rs{" "}
-                    {product.decoratorPrice}
-                  </p>
-                  <p>
-                    <span className="font-semibold">Types:</span>{" "}
-                    {product.typeDecrators?.join(", ")}
-                  </p>
-                </>
-              )}
-
-              {product.serviceType === "carRental" && (
-                <>
-                  <div className="wrap flex flex-col gap-9">
-                    <p className="font-semibold text-2xl">
-                      <span className="">PKR</span>{" "}
-                      {product.carRentalPrice?.toLocaleString()} /
-                      {product.carRentalDuration} day
-                    </p>
-                    <div className="wrap flex justify-around">
-                      <p className="flex gap-2.5 ">
-                        <span className="text-red-500 text-2xl ">
-                          <MdOutlineAirlineSeatReclineNormal />
-                        </span>{" "}
-                        <div className="bd flex font-medium flex-col items-center justify-center ">
-                          <p> Seats</p>
-                          {product.Seats}
-                        </div>
-                      </p>
-                      <p className="flex gap-2.5 ">
-                        <span className="text-red-500 text-2xl ">
-                          <GiCarDoor />
-                        </span>{" "}
-                        <div className="bd flex font-medium flex-col items-center justify-center ">
-                          <p> Doors</p>
-                          {product.Door}
-                        </div>
-                      </p>
-                      <p className="flex gap-2.5 ">
-                        <span className="text-red-500 text-2xl ">
-                          <IoCarSportSharp />
-                        </span>{" "}
-                        <div className="bd flex font-medium flex-col items-center justify-center ">
-                          <p> Transmission</p>
-                          {product.Transmission}
-                        </div>
-                      </p>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* CTA Button */}
-            <button className="w-full py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
-              Book Now
-            </button>
-          </div>
-        </div>
-        {product.serviceType === "catering" && (
-          <div className="flex flex-col md:flex-row gap-8">
-            {/* LEFT SIDE: Menu list */}
-            <div className="w-full md:w-1/3 flex flex-col gap-4">
-              {product.cateringMenu?.map((menu, index) => (
-                <div
-                  key={index}
-                  className={`p-5 rounded-2xl cursor-pointer border transition-all duration-300
-                ${
-                  selectedPlan === index
-                    ? "bg-red-600 text-white border-red-600 shadow-lg transform scale-105"
-                    : "bg-gray-50 border-gray-200 hover:bg-red-50 hover:border-red-400 hover:shadow-md"
-                }`}
-                  onClick={() => {
-                    setSelectedPlan(index);
-                    setGuests(1);
-                  }}
-                >
-                  <p className="font-semibold text-lg">{menu.title}</p>
-                  <p className="text-sm mt-1">
-                    PKR{" "}
-                    <span className="font-bold">
-                      {menu.price.toLocaleString()}
-                    </span>{" "}
-                    / head
+                <div>
+                  <p className="font-medium">Cancellation Policy</p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {product.cancellation}
                   </p>
                 </div>
-              ))}
+              </div>
             </div>
 
-            {/* RIGHT SIDE: Menu details */}
-            <div className="w-full md:w-2/3 bg-white shadow-xl rounded-2xl p-6">
-              {selectedPlan !== null ? (
-                <div className="flex flex-col gap-6">
-                  {/* Title + Price */}
-                  <div>
-                    <h3 className="text-2xl font-bold mb-2 text-gray-800">
-                      {product.cateringMenu[selectedPlan].title}
-                    </h3>
-                    <p className="text-green-600 font-medium text-lg flex items-center gap-2">
-                      <MdAttachMoney className="text-xl" />
-                      Rs. {product.cateringMenu[selectedPlan].price} per head
-                    </p>
+            {product.cateringServices && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                <div className="flex items-center justify-between py-2 border-b">
+                  <div className="flex items-center gap-2">
+                    <FaMusic className="text-orange-600" />
+                    <span>Provide Sound</span>
+                  </div>
+                  <span
+                    className={
+                      product.cateringServices.sound
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }
+                  >
+                    {product.cateringServices.sound ? "Yes" : "No"}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between py-2 border-b">
+                  <div className="flex items-center gap-2">
+                    <FaUtensils className="text-orange-600" />
+                    <span>Provide Plates</span>
+                  </div>
+                  <span
+                    className={
+                      product.cateringServices.plates
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }
+                  >
+                    {product.cateringServices.plates ? "Yes" : "No"}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between py-2 border-b">
+                  <div className="flex items-center gap-2">
+                    <FaChair className="text-orange-600" />
+                    <span>Provide Seating</span>
+                  </div>
+                  <span
+                    className={
+                      product.cateringServices.seating
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }
+                  >
+                    {product.cateringServices.seating ? "Yes" : "No"}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between py-2 border-b">
+                  <div className="flex items-center gap-2">
+                    <FaUserTie className="text-orange-600" />
+                    <span>Provide Waiters</span>
+                  </div>
+                  <span
+                    className={
+                      product.cateringServices.waiters
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }
+                  >
+                    {product.cateringServices.waiters ? "Yes" : "No"}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between py-2 border-b">
+                  <div className="flex items-center gap-2">
+                    <MdCelebration className="text-orange-600" />
+                    <span>Provide Decoration</span>
+                  </div>
+                  <span
+                    className={
+                      product.cateringServices.decoration
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }
+                  >
+                    {product.cateringServices.decoration ? "Yes" : "No"}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div className="mt-6">
+              <p className="font-semibold">Description:</p>
+              <p className="text-gray-700 mt-1">{product.description}</p>
+            </div>
+          </div>
+        );
+
+      case "dj":
+        return (
+          <div className="space-y-6">
+            <p className="font-semibold text-2xl">
+              PKR {product.djRate?.toLocaleString()}
+            </p>
+
+            <div className="flex items-center gap-3">
+              <span className="text-red-500 text-2xl">
+                <BiSolidHourglassTop />
+              </span>
+              <div>
+                <p className="font-medium">Duration</p>
+                <p>{product.djDuration} hours</p>
+              </div>
+            </div>
+
+            <div>
+              <p className="font-semibold">Description:</p>
+              <p className="text-gray-700 mt-1">{product.description}</p>
+            </div>
+          </div>
+        );
+
+      case "photographers":
+        return (
+          <div className="space-y-6">
+            <p className="font-semibold text-2xl">
+              PKR {product.photographerStartingRange?.toLocaleString()} - PKR{" "}
+              {product.photographerexpectedRange}
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="flex items-center gap-3">
+                <span className="text-red-500 text-2xl">
+                  <AiFillExperiment />
+                </span>
+                <div>
+                  <p className="font-medium">Expertise</p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {product.photographerPackage}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-red-500 text-2xl">
+                  <FaUser />
+                </span>
+                <div>
+                  <p className="font-medium">Staff</p>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {product.staff &&
+                      JSON.parse(product.staff).map((item, index) => (
+                        <span
+                          key={index}
+                          className="text-sm bg-gray-100 px-2 py-1 rounded capitalize"
+                        >
+                          {item}
+                        </span>
+                      ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-red-500 text-2xl">
+                  <MdPolicy />
+                </span>
+                <div>
+                  <p className="font-medium">Cancellation Policy</p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {product.cancellation}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <p className="font-semibold">Description:</p>
+              <p className="text-gray-700 mt-1">{product.description}</p>
+            </div>
+
+            <div>
+              <p className="font-semibold">Additional Info:</p>
+              <p className="text-gray-700 mt-1">
+                {product.adddtionalinformation}
+              </p>
+            </div>
+          </div>
+        );
+
+      case "decorators":
+        return (
+          <div className="space-y-6">
+            <p className="font-semibold text-2xl">
+              PKR {product.decoratorminPrice?.toLocaleString() || 0} - PKR{" "}
+              {product.decoratormaxPrice?.toLocaleString() || 0}
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex items-center gap-3">
+                <span className="text-red-500 text-2xl">
+                  <BsBuildingFillAdd />
+                </span>
+                <div>
+                  <p className="font-medium">Type</p>
+                  <p className="text-sm text-gray-600 capitalize mt-1">
+                    {product.decorationtype}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-red-500 text-2xl">
+                  <FaUser />
+                </span>
+                <div>
+                  <p className="font-medium">Staff</p>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {product.staff ? (
+                      JSON.parse(product.staff).map((item, index) => (
+                        <span
+                          key={index}
+                          className="text-sm bg-gray-100 px-2 py-1 rounded capitalize"
+                        >
+                          {item}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-gray-500 text-sm">
+                        No staff info
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-red-500 text-2xl">
+                  <MdPolicy />
+                </span>
+                <div>
+                  <p className="font-medium">Cancellation Policy</p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {product.cancellation || "No cancellation policy"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-red-500 text-2xl">
+                  <IoLocation />
+                </span>
+                <div>
+                  <p className="font-medium">City</p>
+                  <p className="text-sm text-gray-600 capitalize mt-1">
+                    {product.city}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <p className="font-semibold">Description:</p>
+              <p className="text-gray-700 mt-1">{product.description}</p>
+            </div>
+          </div>
+        );
+
+      case "carRental":
+        return (
+          <div className="space-y-6">
+            <p className="font-semibold text-2xl">
+              PKR {product.carRentalPrice?.toLocaleString()} /{" "}
+              {product.carRentalDuration} day
+            </p>
+
+            <div className="grid grid-cols-3 gap-6">
+              <div className="flex flex-col items-center gap-2 p-4 bg-gray-50 rounded-lg">
+                <span className="text-red-500 text-2xl">
+                  <MdOutlineAirlineSeatReclineNormal />
+                </span>
+                <p className="font-medium">Seats</p>
+                <p>{product.Seats}</p>
+              </div>
+
+              <div className="flex flex-col items-center gap-2 p-4 bg-gray-50 rounded-lg">
+                <span className="text-red-500 text-2xl">
+                  <GiCarDoor />
+                </span>
+                <p className="font-medium">Doors</p>
+                <p>{product.Door}</p>
+              </div>
+
+              <div className="flex flex-col items-center gap-2 p-4 bg-gray-50 rounded-lg">
+                <span className="text-red-500 text-2xl">
+                  <IoCarSportSharp />
+                </span>
+                <p className="font-medium">Transmission</p>
+                <p>{product.Transmission}</p>
+              </div>
+            </div>
+
+            <div>
+              <p className="font-semibold">Description:</p>
+              <p className="text-gray-700 mt-1">{product.description}</p>
+            </div>
+          </div>
+        );
+
+      default:
+        return <div>Service details not available</div>;
+    }
+  };
+
+  // Helper function to render package selection (for services that have detailsproduct)
+  const renderPackageSelection = () => {
+    if (!product.detailsproduct || product.detailsproduct.length === 0)
+      return null;
+
+    const needsPersonCounter = product.serviceType === "catering";
+
+    return (
+      <div className="flex flex-col md:flex-row gap-8 mt-8">
+        {/* Package list */}
+        <div className="w-full md:w-1/3 flex flex-col gap-4">
+          {product.detailsproduct.map((pkg, index) => (
+            <div
+              key={index}
+              className={`p-5 rounded-2xl cursor-pointer border transition-all duration-300
+                ${
+                  selectedPlan === index
+                    ? "bg-red-600 text-white border-red-600 shadow-lg"
+                    : "bg-gray-50 border-gray-200 hover:bg-red-50 hover:border-red-400 hover:shadow-md"
+                }`}
+              onClick={() => setSelectedPlan(index)}
+            >
+              <p className="font-semibold text-lg">{pkg.title}</p>
+              <p className="text-sm mt-1">
+                PKR{" "}
+                <span className="font-bold">{pkg.price?.toLocaleString()}</span>
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Package details */}
+        <div className="w-full md:w-2/3 flex flex-col gap-6 bg-white shadow-lg rounded-xl p-6">
+          {selectedPlan !== null && product.detailsproduct[selectedPlan] ? (
+            <>
+              <h3 className="text-2xl font-bold text-gray-800">
+                {product.detailsproduct[selectedPlan].title}
+              </h3>
+
+              <div className="bg-red-600 text-white px-4 py-3 rounded-xl font-semibold text-lg shadow-md w-fit">
+                Package Price: Rs.{" "}
+                {product.detailsproduct[selectedPlan].price?.toLocaleString()}
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-3">Package Details:</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {product.detailsproduct[selectedPlan].details?.map(
+                    (detail, idx) => (
+                      <div
+                        key={idx}
+                        className="border border-gray-200 rounded-lg p-4 bg-gray-50"
+                      >
+                        {typeof detail === "string" ? (
+                          <p className="text-gray-700">{detail}</p>
+                        ) : (
+                          <>
+                            <p className="font-medium text-gray-800 capitalize mb-2">
+                              {detail.title}
+                            </p>
+                            {Array.isArray(detail.description) ? (
+                              <ul className="list-disc list-inside text-gray-600 space-y-1">
+                                {detail.description.map((desc, i) => (
+                                  <li key={i}>{desc}</li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="text-gray-600">
+                                {detail.description}
+                              </p>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {needsPersonCounter && (
+                <>
+                  <div className="flex items-center gap-4 mt-4">
+                    <span className="font-semibold">Number of Persons:</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setPersons((p) => Math.max(1, p - 1))}
+                        className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-lg hover:bg-gray-300"
+                      >
+                        –
+                      </button>
+                      <span className="font-bold text-lg w-10 text-center">
+                        {persons}
+                      </span>
+                      <button
+                        onClick={() => setPersons((p) => p + 1)}
+                        className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-lg hover:bg-gray-300"
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Guests Counter */}
-                  <div className="flex items-center gap-4">
-                    <button
-                      onClick={() => setGuests((g) => Math.max(1, g - 1))}
-                      className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 font-bold text-xl"
-                    >
-                      -
-                    </button>
-                    <span className="text-lg font-semibold flex items-center gap-2">
-                      <FaUsers className="text-red-600" /> {guests} Guests
-                    </span>
-                    <button
-                      onClick={() => setGuests((g) => g + 1)}
-                      className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 font-bold text-xl"
-                    >
-                      +
-                    </button>
-                  </div>
-
-                  {/* Total Price */}
-                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-lg font-semibold text-blue-800">
-                      Total: Rs.{" "}
-                      {(
-                        product.cateringMenu[selectedPlan].price * guests
-                      ).toLocaleString()}
-                    </p>
-                  </div>
-
-                  {/* Date Picker */}
-                  <div>
-                    <label className="font-semibold text-gray-700 flex items-center gap-2 mb-2">
-                      <FaCalendarAlt className="text-red-600" /> Select Event
-                      Date
+                  <div className="mt-4">
+                    <label className="font-semibold block mb-2">
+                      Event Date:
                     </label>
-                    <DatePicker
-                      selected={selectedDate}
-                      onChange={(date) => setSelectedDate(date)}
-                      className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-500 outline-none"
-                      placeholderText="Choose your event date"
-                      minDate={new Date()}
+                    <input
+                      type="date"
+                      value={eventDate}
+                      onChange={(e) => setEventDate(e.target.value)}
+                      min={new Date().toISOString().split("T")[0]}
+                      className="border p-2 rounded-lg w-full md:w-auto"
                     />
                   </div>
 
-                  {/* Details List */}
-                  <div>
-                    <h4 className="font-semibold mb-2">Menu Includes:</h4>
-                    <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                      {product.cateringMenu[selectedPlan].details.map(
-                        (detail, idx) => (
-                          <li key={idx}>{detail}</li>
-                        )
-                      )}
-                    </ul>
+                  <div className="bg-green-600 text-white px-4 py-3 rounded-xl font-semibold text-lg shadow-md w-fit mt-4">
+                    Total Price: Rs.{" "}
+                    {(
+                      persons * product.detailsproduct[selectedPlan].price
+                    ).toLocaleString()}
                   </div>
-
-                  {/* Availability Button */}
-                  <button
-                    className="mt-4 w-full bg-red-600 text-white py-3 rounded-xl text-lg font-semibold hover:bg-red-700 transition-all"
-                    onClick={() =>
-                      alert(
-                        `Checking availability for ${
-                          product.cateringMenu[selectedPlan].title
-                        } on ${selectedDate?.toLocaleDateString()} for ${guests} guests`
-                      )
-                    }
-                  >
-                    Check Availability
-                  </button>
-                </div>
-              ) : (
-                <p className="text-gray-500 text-center mt-10">
-                  Select a menu to see details
-                </p>
+                </>
               )}
-            </div>
-          </div>
-        )}
-
-        {product.serviceType === "photographers" && (
-          <div className="flex flex-col md:flex-row gap-8">
-            {/* LEFT SIDE: Plans list */}
-            <div className="w-full md:w-1/3 flex flex-col gap-4">
-              {product.photographerPlans?.map((plan, index) => (
-                <div
-                  key={index}
-                  className={`p-5 rounded-2xl cursor-pointer border transition-all duration-300
-            ${
-              selectedPlan === index
-                ? "bg-red-600 text-white border-red-600 shadow-lg transform scale-105"
-                : "bg-gray-50 border-gray-200 hover:bg-red-50 hover:border-red-400 hover:shadow-md"
-            }`}
-                  onClick={() => setSelectedPlan(index)}
-                >
-                  <p className="font-semibold text-lg">{plan.title}</p>
-                  <p className="text-sm mt-1">
-                    PKR{" "}
-                    <span className="font-bold">
-                      {plan.price.toLocaleString()}
-                    </span>
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            {/* RIGHT SIDE: Plan details */}
-            <div className="w-full md:w-2/3 bg-white shadow-lg rounded-2xl p-6">
-              {selectedPlan !== null ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {[
-                    { key: "event", icon: TfiGallery, label: "Deliverables" },
-                    {
-                      key: "photography",
-                      icon: FaCamera,
-                      label: "Photography",
-                    },
-                    { key: "team", icon: TiUserAdd, label: "Team" },
-                    {
-                      key: "videography",
-                      icon: IoVideocam,
-                      label: "Videography",
-                    },
-                  ].map(({ key, icon: Icon, label }) => (
-                    <div key={key}>
-                      <h3 className="font-bold flex items-center gap-2  text-lg">
-                        <Icon className="text-red-600" /> {label}
-                      </h3>
-                      <ul className="list-disc ml-5 mt-2 text-sm text-gray-700 space-y-1">
-                        {product.photographerPlans[selectedPlan].deliverables[
-                          key
-                        ].map((item, idx) => (
-                          <li key={idx}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-500 text-center mt-10">
-                  Select a plan to see details
-                </p>
-              )}
-            </div>
-          </div>
-        )}
-        {product.serviceType === "carRental" && (
-          <div className="desc">
-            <p>
-              <span className="font-bold">Description:</span>{" "}
-              {product.description}
+            </>
+          ) : (
+            <p className="text-gray-500 text-center py-10">
+              Select a package to see details
             </p>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="bg-gray-100 min-h-screen py-8">
+      <div className="container mx-auto px-4">
+        {/* Main Product Card */}
+        <div className="bg-white rounded-2xl shadow-md overflow-hidden">
+          <div className="grid md:grid-cols-2 gap-8 p-6">
+            {/* Images Section */}
+            <div className="flex flex-col-reverse md:flex-row gap-4">
+              {/* Thumbnails */}
+              <div className="flex md:flex-col gap-3 overflow-x-auto py-2 md:py-0">
+                {product.images?.map((img, i) => {
+                  const fullUrl = `http://localhost:5000/${img}`;
+                  return (
+                    <img
+                      key={i}
+                      src={fullUrl}
+                      onClick={() => setSelectedImage(fullUrl)}
+                      alt="thumb"
+                      className={`w-16 h-16 object-cover rounded-md transition-all duration-200 cursor-pointer
+                        ${
+                          (selectedImage ||
+                            `http://localhost:5000/${product.images?.[0]}`) ===
+                          fullUrl
+                            ? "border-2 border-red-600 shadow-md"
+                            : "border border-gray-300 hover:border-red-400"
+                        }`}
+                    />
+                  );
+                })}
+              </div>
+
+              {/* Main Image */}
+              <div className="flex-1">
+                <img
+                  src={
+                    selectedImage ||
+                    `http://localhost:5000/${product.images?.[0]}`
+                  }
+                  alt={product.title}
+                  className="w-full h-64 md:h-96 object-cover rounded-xl shadow-md"
+                />
+              </div>
+            </div>
+
+            {/* Details Section */}
+            <div className="flex flex-col gap-6">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 capitalize">
+                  {product.title}
+                </h1>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-2 text-gray-600">
+                  <span>
+                    by{" "}
+                    <span className="text-red-500 capitalize underline">
+                      {product?.user.businessName}
+                    </span>
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <IoLocationSharp />
+                    {product.Location}
+                  </span>
+                </div>
+              </div>
+              <div className="location flex  items-center gap-2 text-gray-600">
+                <FaPhoneAlt className="text-red-500" />
+                {product.contactNumber}
+              </div>
+
+              <div className="py-4 border-t border-gray-200">
+                {renderServiceDetails()}
+              </div>
+
+              <button
+                onClick={() => handlenavigate(product)}
+                className="w-full py-3 cursor-pointer  bg-red-500 text-white rounded-lg shadow hover:bg-red-700 transition"
+              >
+                Book Now
+              </button>
+            </div>
           </div>
-        )}
-        {product.reviews && product.reviews.length > 0 && (
-          <div className="bg-white shadow p-6 rounded-2xl">
+        </div>
+
+        {/* Package Selection (for applicable services) */}
+        {product.detailsproduct &&
+          product.detailsproduct.length > 0 &&
+          renderPackageSelection()}
+
+        {/* Reviews Section */}
+        {/* {product.reviews && product.reviews.length > 0 && (
+          <div className="bg-white shadow rounded-2xl p-6 mt-8">
             <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
             <div className="space-y-4">
               {product.reviews.map((r, i) => (
-                <div key={i} className="border-b pb-3">
+                <div
+                  key={i}
+                  className="border-b pb-4 last:border-b-0 last:pb-0"
+                >
                   <p className="font-medium text-gray-800">
                     {r.user?.name || "Anonymous"}
                   </p>
-                  <p className="text-sm text-gray-600">{r.comment}</p>
-                  <p className="text-yellow-500 font-semibold mt-1">
-                    ⭐ {r.rating}
-                  </p>
+                  <p className="text-sm text-gray-600 mt-1">{r.comment}</p>
+                  <div className="flex items-center mt-2">
+                    <div className="text-yellow-500 flex">
+                      {"★".repeat(Math.round(r.rating))}
+                      {"☆".repeat(5 - Math.round(r.rating))}
+                    </div>
+                    <span className="ml-2 text-sm font-semibold">
+                      {r.rating}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

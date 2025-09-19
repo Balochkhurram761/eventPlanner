@@ -1,43 +1,55 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useProduct } from "../../context/ProductContext";
 import FilterBox from "../filterData/FilterData";
 import { CiLocationOn } from "react-icons/ci";
-import { CiStar } from "react-icons/ci";
+import { MdOutlineStar } from "react-icons/md";
+import { IoLocationSharp } from "react-icons/io5";
 
 const ProductUI = () => {
   const { serviceType, venue } = useParams();
   const location = useLocation();
   const { fetchProducts } = useProduct();
   const [products, setProducts] = useState([]);
+  const navigate = useNavigate();
+  const handlenavigate = (product) => {
+    navigate("/bookevent", { state: { product } });
+  };
   const [filters, setFilters] = useState({
     username: "",
-    serviceType: serviceType,
+    serviceType: serviceType || "",
     location: "",
     venue: venue || "",
   });
 
+  useEffect(() => {
+    const loadData = async () => {
+      const data = await fetchProducts(filters);
+      setProducts(data || []);
+    };
+    loadData();
+  }, [filters, fetchProducts]);
+
+  // Initial load from query params (agar URL se aaye)
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const newFilters = {
       username: params.get("username") || "",
       serviceType: params.get("serviceType") || serviceType,
       location: params.get("location") || "",
-      venue: venue || "",
+      ...(venue && { venue }),
     };
     setFilters(newFilters);
-
-    const loadData = async () => {
-      const data = await fetchProducts(newFilters); // fetch with combined filters
-      setProducts(data || []);
-    };
-    loadData();
-  }, [location.search, fetchProducts, serviceType, venue]);
+  }, [location.search, serviceType, venue]);
 
   return (
     <div className="mx-auto w-[88%] px-6 py-8">
       <div className="">
-        <FilterBox onSearch={setFilters} />
+        <FilterBox
+          onSearch={(newFilters) =>
+            setFilters({ ...filters, ...newFilters, serviceType, venue })
+          }
+        />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -69,24 +81,29 @@ const ProductUI = () => {
                 </div>
               )}
 
-              <div className="p-4">
+              <div className="p-4 flex  flex-col gap-1.5">
                 <h3 className="text-lg font-semibold text-gray-800">
                   {product.title}
                 </h3>
                 <p className="text-sm text-gray-500 mb-2">
                   {product.description.slice(0, 60)}...
                 </p>
-                <p className="text-[17px]  flex items-center gap-2 capitalize  text-[#94624b] font-semibold">
-                  <CiLocationOn />
+                <p className="text-[17px]  flex items-center gap-2 capitalize  font-semibold">
+                  <IoLocationSharp className="text-red-500" />
+
                   {product.city}
                 </p>
 
-                <div className="flex justify-between items-center mt-3">
-                  <span className="text-sm flex items-center gap-1 font-bold text-green-600">
-                    <CiStar />
-                    {product.ratings || 0} / 5
-                  </span>
-                  <button className="cursor-pointer bg-[#94624b] text-white px-4 py-1 rounded-md hover:bg-[#7a4e39] transition">
+                <div className="flex justify-between items-center ">
+                  <p className="text-[#777] flex items-center  gap-0.5">
+                    <MdOutlineStar className="text-red-500" />
+                    {product.ratings} (100)
+                  </p>
+
+                  <button
+                    onClick={() => handlenavigate(product)}
+                    className="cursor-pointer bg-[#94624b] text-white px-4 py-1 rounded-md hover:bg-[#7a4e39] transition"
+                  >
                     Book Now
                   </button>
                 </div>
