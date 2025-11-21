@@ -80,7 +80,7 @@ export const generateDeals = async (req, res) => {
   try {
     let { prompt, budget, guests, services } = req.body;
 
-    // 🔹 Parse Prompt if user sends text
+    //  Parse Prompt if user sends text
     if (prompt) {
       const parsed = parsePrompt(prompt);
       budget = budget || parsed.budget;
@@ -119,7 +119,8 @@ export const generateDeals = async (req, res) => {
       });
     }
 
-    // 🔹 Single-service request → show all vendors under budget directly
+    
+    // Single-service request → show all vendors under budget directly
     if (services.length === 1) {
       const serviceType = services[0].toLowerCase();
 
@@ -142,7 +143,7 @@ export const generateDeals = async (req, res) => {
       });
     }
 
-    // 🔹 Multi-service (combine vendors logically)
+    //  Multi-service (combine vendors logically)
     const vendorGroups = {};
     for (const v of vendors) {
       const key = v.user?._id?.toString() || v._id.toString();
@@ -153,7 +154,7 @@ export const generateDeals = async (req, res) => {
       vendorGroups[key].total += getVendorPrice(v, guests);
     }
 
-    // 🔹 Filter only within budget
+    //  Filter only within budget
     const sortedGroups = Object.values(vendorGroups).sort(
       (a, b) => a.total - b.total
     );

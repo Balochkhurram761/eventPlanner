@@ -70,10 +70,10 @@ function AiPlanner() {
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <h1 className="text-3xl font-extrabold mb-6 text-center">
-        🎉 AI Event Planner
+         AI Event Planner
       </h1>
 
-      {/* 🔹 Prompt Form */}
+      {/*  Prompt Form */}
       <form onSubmit={handleSubmit} className="flex gap-2 mb-8 justify-center">
         <input
           type="text"
@@ -94,38 +94,38 @@ function AiPlanner() {
       {/* 🔹 AI Summary + Detected Info */}
       {(summary || details.budget) && (
         <div className="mb-6 p-5 border rounded-lg bg-blue-50 shadow">
-          <h2 className="font-semibold text-lg mb-2">🤖 AI Summary</h2>
+          <h2 className="font-semibold text-lg mb-2"> AI Summary</h2>
           {summary && <p className="text-gray-700 mb-2">{summary}</p>}
           <div className="flex flex-wrap gap-4 text-sm text-gray-700">
             {details.location && (
               <p>
-                📍 <strong>{details.location}</strong>
+                 <strong>{details.location}</strong>
               </p>
             )}
             {details.guests && (
               <p>
-                👥 <strong>{details.guests} Guests</strong>
+                 <strong>{details.guests} Guests</strong>
               </p>
             )}
             {details.budget && (
               <p>
-                💰 <strong>PKR {details.budget}</strong>
+                 <strong>PKR {details.budget}</strong>
               </p>
             )}
             {details.services?.length > 0 && (
               <p>
-                🧾 Services: <strong>{details.services.join(", ")}</strong>
+                 Services: <strong>{details.services.join(", ")}</strong>
               </p>
             )}
           </div>
         </div>
       )}
 
-      {/* 🔹 Vendor Cards */}
+      {/*  Vendor Cards */}
       {vendors.length > 0 ? (
         <div>
           <h2 className="text-2xl font-bold mb-4 text-gray-800">
-            ✨ Recommended Vendors
+             Recommended Vendors
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {vendors.map((v, i) => (
@@ -157,7 +157,7 @@ function AiPlanner() {
                   PKR {getVendorPrice(v)}
                 </p>
                 <p className="text-sm text-gray-500 mb-3">
-                  📍 {v.city || "Unknown Location"}
+                   {v.city || "Unknown Location"}
                 </p>
 
                 <button className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">

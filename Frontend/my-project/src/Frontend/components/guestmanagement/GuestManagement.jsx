@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import * as XLSX from "xlsx";
 
-const events = ["Mehndi", "Barat", "Walima", "Event 1", "Event 2"];
+const events = ["Mehndi", "Barat", "Walima"];
 
 export default function GuestListManager() {
   const [guestName, setGuestName] = useState("");
@@ -24,18 +24,18 @@ export default function GuestListManager() {
   const [selectedEvents, setSelectedEvents] = useState([]);
   const [guests, setGuests] = useState([]);
 
-  // 🧠 Load saved guests
+  //  Load saved guests
   useEffect(() => {
     const stored = localStorage.getItem("guestList");
     if (stored) setGuests(JSON.parse(stored));
   }, []);
 
-  // 💾 Save guests
+  //  Save guests
   useEffect(() => {
     localStorage.setItem("guestList", JSON.stringify(guests));
   }, [guests]);
 
-  // ➕ Add Guest
+  //  Add Guest
   const addGuest = () => {
     if (!guestName.trim() || selectedEvents.length === 0) return;
     const newGuest = {
@@ -49,20 +49,20 @@ export default function GuestListManager() {
     setSelectedEvents([]);
   };
 
-  // ❌ Remove Guest
+  //  Remove Guest
   const removeGuest = (index) => {
     setGuests(guests.filter((_, i) => i !== index));
   };
 
-  // 📊 Export to Excel
+  //  Export to Excel
   const exportToExcel = () => {
     const wsData = [["Name", "Persons", "Events"]];
     guests.forEach((g) =>
       wsData.push([g.name, g.persons, g.events.join(", ")])
     );
 
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    const wb = XLSX.utils.book_new(); // create new file excel
+    const ws = XLSX.utils.aoa_to_sheet(wsData); // array data convert to excel
     XLSX.utils.book_append_sheet(wb, ws, "Guest List");
     XLSX.writeFile(wb, "GuestList.xlsx");
   };

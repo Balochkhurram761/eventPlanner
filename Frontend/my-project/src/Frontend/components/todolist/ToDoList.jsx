@@ -6,7 +6,7 @@ export default function EventTodoList() {
     const saved = localStorage.getItem("tasks");
     return saved
       ? JSON.parse(saved)
-      : ["Book DJ", "Book Catering", "Book Hall"];
+      : [];
   });
 
   const [newTask, setNewTask] = useState("");
@@ -23,17 +23,6 @@ export default function EventTodoList() {
 
   const removeTask = (index) => {
     const updated = tasks.filter((_, i) => i !== index);
-    setTasks(updated);
-  };
-
-  const toggleDone = (index) => {
-    const updated = tasks.map((task, i) =>
-      i === index
-        ? task.startsWith("✔️ ")
-          ? task.slice(3)
-          : `✔️ ${task}`
-        : task
-    );
     setTasks(updated);
   };
 
@@ -67,9 +56,8 @@ export default function EventTodoList() {
               className="flex justify-between items-center bg-slate-50 p-2 rounded-lg"
             >
               <span
-                onClick={() => toggleDone(index)}
                 className={`cursor-pointer ${
-                  task.startsWith("✔️ ")
+                  task.startsWith(" ")
                     ? "line-through text-gray-400"
                     : "text-gray-700"
                 }`}
