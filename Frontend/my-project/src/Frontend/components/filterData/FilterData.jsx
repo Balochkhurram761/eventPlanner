@@ -13,7 +13,7 @@ const FilterBox = ({ onSearch }) => {
   };
 
   return (
-    <div className="bg-white border border-black rounded-md p-6 mb-10">
+    <div className="bg-white border border-pink-700 rounded-md p-6 mb-10">
       <h2 className="text-lg font-semibold text-gray-700 mb-4">
         Refine Your Search
       </h2>

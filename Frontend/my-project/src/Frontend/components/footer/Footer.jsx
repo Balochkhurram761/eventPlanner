@@ -5,6 +5,7 @@ import {
   FaInstagram,
   FaLinkedin,
 } from "react-icons/fa";
+import { CiHeart } from "react-icons/ci";
 
 const Footer = () => {
   return (
@@ -127,7 +128,6 @@ const Footer = () => {
       {/* Bottom */}
       <div className="border-t border-gray-700 mt-10 pt-4 text-center text-sm text-gray-500 space-y-2">
         <p>© {new Date().getFullYear()} WebEvent. All rights reserved.</p>
-        <p className="text-[#94624b]">Made with ❤️ by FYP Team</p>
       </div>
     </footer>
   );

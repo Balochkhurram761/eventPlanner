@@ -2,7 +2,7 @@ import React from "react";
 
 const products = [
   {
-    link: "/venue",
+    link: "/hall",
     image: "../src/assets/herosection/weddingvenue.jpg",
     title: "Venue",
   },
@@ -12,22 +12,22 @@ const products = [
     title: "DJ Services",
   },
   {
-    link: "/Photographers ",
+    link: "/photographers ",
     image: "../src/assets/herosection/camera.jpg",
     title: "Photographers ",
   },
   {
     link: "/catering",
     image: "../src/assets/herosection/catering.jpg",
-    title: "Catering",
+    title: "catering",
   },
   {
-    link: "/rentalcar",
+    link: "/carRental",
     image: "../src/assets/herosection/rentalcar.jpg",
     title: "Car Rental",
   },
   {
-    link: "/theme",
+    link: "/decorators",
     image: "../src/assets/herosection/theme.jpg",
     title: "Decorators",
   },

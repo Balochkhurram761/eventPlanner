@@ -14,6 +14,7 @@ import {
   Checkbox,
   ListItemText,
 } from "@mui/material";
+import { pink } from "@mui/material/colors";
 import * as XLSX from "xlsx";
 
 const events = ["Mehndi", "Barat", "Walima"];
@@ -69,12 +70,17 @@ export default function GuestListManager() {
 
   return (
     <Box sx={{ p: 4, maxWidth: 700, mx: "auto" }}>
-      <Typography variant="h5" fontWeight="bold" gutterBottom>
+      <Typography
+        variant="h5"
+        fontWeight="bold"
+        gutterBottom
+        sx={{ color: pink[700] }}
+      >
         Guest List Manager
       </Typography>
 
       {/* Input Section */}
-      <Stack direction="row" spacing={2} mb={3} flexWrap="wrap">
+      <Stack direction="" gap={2} spacing={2} mb={3} flexWrap="wrap">
         <TextField
           label="Guest Name"
           value={guestName}
@@ -110,7 +116,16 @@ export default function GuestListManager() {
           </Select>
         </FormControl>
 
-        <Button variant="contained" onClick={addGuest}>
+        <Button
+          variant="contained"
+          onClick={addGuest}
+          sx={{
+            backgroundColor: "#e91e63", 
+            "&:hover": {
+              backgroundColor: "#c2185b", 
+            },
+          }}
+        >
           Add
         </Button>
       </Stack>
@@ -129,7 +144,7 @@ export default function GuestListManager() {
           >
             <Typography>
               <strong>{g.name}</strong> — {g.persons} person(s) <br />
-              <small>🎊 Events: {g.events.join(", ")}</small>
+              <small>Events: {g.events.join(", ")}</small>
             </Typography>
             <Button
               color="error"
@@ -149,7 +164,7 @@ export default function GuestListManager() {
           <Button
             variant="contained"
             color="success"
-            startIcon={<span>📊</span>}
+            startIcon={<span></span>}
             onClick={exportToExcel}
           >
             Export to Excel

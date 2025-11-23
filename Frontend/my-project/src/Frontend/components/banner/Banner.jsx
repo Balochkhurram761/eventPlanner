@@ -71,14 +71,14 @@ const HeroSection = () => {
               className="w-full border border-gray-300 rounded-md p-3"
             >
               <option value="">Select Location</option>
-              <option value="karachi">Karachi</option>
-              <option value="lahore">Lahore</option>
-              <option value="islamabad">Islamabad</option>
+              <option value="Karachi">Karachi</option>
+              <option value="Lahore">Lahore</option>
+              <option value="Islamabad">Islamabad</option>
             </select>
 
             <button
               type="submit"
-              className="w-full bg-[#a47c68] text-white py-3 rounded-md"
+              className="w-full bg-[#a47c68] cursor-pointer hover:bg-[#a47c63] text-white py-3 rounded-md"
             >
               Find Vendor
             </button>
