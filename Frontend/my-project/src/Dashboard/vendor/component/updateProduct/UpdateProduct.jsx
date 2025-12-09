@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import Slide from "@mui/material/Slide";
 import axios from "axios";
@@ -9,8 +9,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const UploadProduct = () => {
-  const { setProducts, open, setOpen } = useProduct();
+const UpdateProduct = () => {
+  const { setProducts, open, editProduct, setOpen } = useProduct();
 
   const [field, setFiled] = useState("hall");
   const initialForm = {
@@ -219,8 +219,8 @@ const UploadProduct = () => {
       });
       formData.append("userId", userId);
 
-      const { data } = await axios.post(
-        "http://localhost:5000/api/auth/vendor/uploadproduct",
+      const { data } = await axios.put(
+        `http://localhost:5000/api/auth/vendor/updatproduct/${editProduct._id}`,
         formData,
         {
           headers: {
@@ -229,7 +229,6 @@ const UploadProduct = () => {
           },
         }
       );
-
       setProducts((prev) => [data.data, ...prev]);
       setProductForm(initialForm);
 
@@ -238,6 +237,25 @@ const UploadProduct = () => {
       console.error("Create error:", err.response?.data || err.message);
     }
   };
+  useEffect(() => {
+    if (editProduct) {
+      setProductForm((prev) => ({
+        ...initialForm, // default fields
+        ...editProduct, // overwrite with editProduct
+        cateringServices: {
+          ...initialForm.cateringServices,
+          ...editProduct.cateringServices,
+        },
+        detailsproduct:
+          editProduct.detailsproduct || initialForm.detailsproduct,
+      }));
+      setFiled(editProduct.serviceType || "hall");
+    } else {
+      setProductForm(initialForm);
+      setFiled("hall");
+    }
+    console.log("editProduct inside UpdateProduct:", editProduct);
+  }, [editProduct]);
 
   return (
     <>
@@ -251,7 +269,7 @@ const UploadProduct = () => {
       >
         <div className="p-6 w-[320px] sm:w-[460px]">
           <h2 className="text-xl font-semibold mb-4 text-center">
-            Add New Product
+            Edit Product
           </h2>
           <form className="flex flex-col gap-4" onSubmit={uploadproduct}>
             {/* Service Type */}
@@ -859,4 +877,4 @@ const UploadProduct = () => {
   );
 };
 
-export default UploadProduct;
+export default UpdateProduct;

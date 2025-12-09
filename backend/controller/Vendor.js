@@ -135,13 +135,13 @@ export const fetchdata = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Vendor services fetched successfully ✅",
+      message: "Vendor services fetched successfully ",
       data: getdata,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to fetch vendor services ❌",
+      message: "Failed to fetch vendor services ",
       error: error.message,
     });
   }
@@ -189,20 +189,20 @@ export const updateProduct = async (req, res) => {
     if (!updatedData) {
       return res.status(404).json({
         success: false,
-        message: "Product not found ❌",
+        message: "Product not found ",
       });
     }
 
     res.status(200).json({
       success: true,
-      message: "Product updated successfully ✅",
+      message: "Product updated successfully ",
       data: updatedData,
     });
   } catch (error) {
     console.error("updateProduct Error:", error.message);
     res.status(500).json({
       success: false,
-      message: "Failed to update product ❌",
+      message: "Failed to update product",
       error: error.message,
     });
   }
@@ -230,13 +230,13 @@ export const getdata = async (req, res) => {
       filter.title = { $regex: search, $options: "i" };
     }
 
-    // ✅ Vendor name filter (populate se)
+    //  Vendor name filter (populate se)
     let userFilter = {};
     if (username) {
       userFilter.name = { $regex: username, $options: "i" }; // username → name
     }
 
-    // ✅ Sab vendors fetch karo with user populated
+    //  Sab vendors fetch karo with user populated
     let userdata = await Vendor.find(filter).populate({
       path: "user",
       match: userFilter,
@@ -245,7 +245,7 @@ export const getdata = async (req, res) => {
 
     userdata = userdata.filter((v) => v.user !== null);
 
-    // ✅ Price filter (serviceType ke hisaab se field check karo)
+    //  Price filter (serviceType ke hisaab se field check karo)
     if (maxPrice) {
       userdata = userdata.filter((vendor) => {
         switch (vendor.serviceType) {

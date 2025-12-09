@@ -6,7 +6,9 @@ const ProductContext = createContext();
 export const ProductProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [open, setOpen] = useState(false);
 
+  const [EditProduct, setEditProduct] = useState(null);
   const getproductdata = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
     const token = user?.token;
@@ -30,7 +32,16 @@ export const ProductProvider = ({ children }) => {
 
   return (
     <ProductContext.Provider
-      value={{ products, setProducts, searchQuery, setSearchQuery }}
+      value={{
+        products,
+        setProducts,
+        open,
+        setOpen,
+        searchQuery,
+        setSearchQuery,
+        EditProduct,
+        setEditProduct,
+      }}
     >
       {children}
     </ProductContext.Provider>

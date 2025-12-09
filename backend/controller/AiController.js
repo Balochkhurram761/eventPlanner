@@ -120,7 +120,7 @@ export const generateDeals = async (req, res) => {
     }
 
     
-    // Single-service request → show all vendors under budget directly
+    // Single-service request  show all vendors under budget directly
     if (services.length === 1) {
       const serviceType = services[0].toLowerCase();
 
