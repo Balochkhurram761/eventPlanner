@@ -21,12 +21,12 @@ async function localSummary(prompt) {
   }
 }
 
-function getVendorPrice(vendor, guests = 1) {
+function getVendorPrice(vendor, guests) {
   let price = 0;
   switch (vendor.serviceType?.toLowerCase() || vendor.service?.toLowerCase()) {
     case "hall":
       price = vendor.hallPricePerHead || 0;
-      break;
+      return price * guests;
     case "catering":
       price = vendor.cateringminPerHead || vendor.cateringmaxPerHead || 0;
       break;
@@ -34,10 +34,7 @@ function getVendorPrice(vendor, guests = 1) {
       price = vendor.djRate || 0;
       break;
     case "photographers":
-      price =
-        vendor.photographerStartingRange ||
-        vendor.photographerexpectedRange ||
-        0;
+      price = vendor.photographerStartingRange || 0;
       break;
     case "decorators":
       price = vendor.decoratorminPrice || vendor.decoratormaxPrice || 0;
@@ -57,15 +54,25 @@ function getVendorPrice(vendor, guests = 1) {
 function parsePrompt(prompt) {
   const text = prompt.toLowerCase();
   let budget = 0,
-    guests = 0;
+    guests = 0,
+    city = "";
   const services = [];
 
+  // ---- Budget ----
   const budgetMatch = text.match(/(\d{3,})\s*(pkr|rs|rupees)?/);
   if (budgetMatch) budget = parseInt(budgetMatch[1]);
 
-  const guestsMatch = text.match(/(\d+)\s*(guest|log|people|persons|invitees)/);
+  // ---- Guests ----
+  const guestsMatch = text.match(
+    /(\d+)\s*(guest|guests|log|people|persons|invitees)/i
+  );
   if (guestsMatch) guests = parseInt(guestsMatch[1]);
+  if (!guests && text.includes("guest")) {
+    const fallback = text.match(/guest[s]?\s*([0-9]+)/);
+    if (fallback) guests = parseInt(fallback[1]);
+  }
 
+  // ---- Services ----
   if (text.includes("catering")) services.push("catering");
   if (text.includes("dj")) services.push("dj");
   if (text.includes("photo")) services.push("photographers");
@@ -73,19 +80,26 @@ function parsePrompt(prompt) {
   if (text.includes("car")) services.push("carrental");
   if (text.includes("decor")) services.push("decorators");
 
-  return { budget, guests, services };
+  // ---- City ----
+  if (text.includes("lahore")) city = "Lahore";
+  else if (text.includes("karachi")) city = "Karachi";
+  else if (text.includes("islamabad")) city = "Islamabad";
+
+  return { budget, guests, services, city };
 }
 
 export const generateDeals = async (req, res) => {
   try {
-    let { prompt, budget, guests, services } = req.body;
+    let { prompt, budget, guests, services, city } = req.body;
+    let parsed = {};
 
-    //  Parse Prompt if user sends text
+    // Parse prompt if provided
     if (prompt) {
-      const parsed = parsePrompt(prompt);
+      parsed = parsePrompt(prompt);
       budget = budget || parsed.budget;
       guests = guests || parsed.guests || 1;
       services = services?.length ? services : parsed.services;
+      city = city || parsed.city;
     }
 
     if (!budget || !services?.length) {
@@ -94,9 +108,16 @@ export const generateDeals = async (req, res) => {
         .json({ success: false, message: "Budget or services missing." });
     }
 
-    const location = "Lahore";
+    if (!city) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Please specify the city (Lahore, Karachi, Islamabad) in your request.",
+      });
+    }
+
+    const locationRegex = new RegExp(city, "i");
     const serviceRegex = services.map((s) => new RegExp(s, "i"));
-    const locationRegex = new RegExp(location, "i");
 
     const vendors = await Vendor.find({
       $and: [
@@ -115,19 +136,26 @@ export const generateDeals = async (req, res) => {
     if (!vendors.length) {
       return res.status(404).json({
         success: false,
-        message: "No vendors found in Lahore for selected services.",
+        message: `No vendors found in ${city} for selected services.`,
       });
     }
 
-    
-    // Single-service request  show all vendors under budget directly
+    // Single-service request
     if (services.length === 1) {
-      const serviceType = services[0].toLowerCase();
+      const filteredVendors = vendors.filter(
+        (v) => getVendorPrice(v, guests) <= budget
+      );
 
-      const filteredVendors = vendors.filter((v) => {
-        const price = getVendorPrice(v, guests);
-        return price <= budget;
-      });
+      if (filteredVendors.length === 0) {
+        return res.status(200).json({
+          success: false,
+          message: `No vendors available within your budget of PKR ${budget}. Please consider increasing your budget.`,
+          budget,
+          guests,
+          location: city,
+          services,
+        });
+      }
 
       const ai_summary = prompt ? await localSummary(prompt) : null;
 
@@ -135,30 +163,38 @@ export const generateDeals = async (req, res) => {
         success: true,
         budget,
         guests,
-        location,
+        location: city,
         services,
         totalVendorsFound: filteredVendors.length,
-        deals: [{ services: filteredVendors }], // for frontend consistency
+        deals: [{ services: filteredVendors }],
         ai_summary,
       });
     }
 
-    //  Multi-service (combine vendors logically)
+    // Multi-service combination
     const vendorGroups = {};
     for (const v of vendors) {
       const key = v.user?._id?.toString() || v._id.toString();
       if (!vendorGroups[key])
         vendorGroups[key] = { business: v.user, services: [], total: 0 };
-
       vendorGroups[key].services.push(v);
       vendorGroups[key].total += getVendorPrice(v, guests);
     }
 
-    //  Filter only within budget
-    const sortedGroups = Object.values(vendorGroups).sort(
-      (a, b) => a.total - b.total
-    );
-    const topDeals = sortedGroups.filter((g) => g.total <= budget).slice(0, 10);
+    const topDeals = Object.values(vendorGroups)
+      .filter((g) => g.total <= budget)
+      .sort((a, b) => a.total - b.total);
+
+    if (topDeals.length === 0) {
+      return res.status(200).json({
+        success: false,
+        message: `No vendor combinations fit within your budget of PKR ${budget}. Please consider increasing your budget.`,
+        budget,
+        guests,
+        location: city,
+        services,
+      });
+    }
 
     const ai_summary = prompt ? await localSummary(prompt) : null;
 
@@ -166,7 +202,7 @@ export const generateDeals = async (req, res) => {
       success: true,
       budget,
       guests,
-      location,
+      location: city,
       services,
       totalVendorsFound: vendors.length,
       deals: topDeals,
