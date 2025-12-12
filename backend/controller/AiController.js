@@ -140,12 +140,10 @@ export const generateDeals = async (req, res) => {
     }).lean();
 
     if (!vendors.length)
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: `No vendors found in ${city} for selected services.`,
-        });
+      return res.status(404).json({
+        success: false,
+        message: `No vendors found in ${city} for selected services.`,
+      });
 
     // Single-service logic
     if (services.length === 1) {
