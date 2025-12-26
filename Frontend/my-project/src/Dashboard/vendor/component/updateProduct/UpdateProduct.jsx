@@ -3,6 +3,7 @@ import Dialog from "@mui/material/Dialog";
 import Slide from "@mui/material/Slide";
 import axios from "axios";
 import { useProduct } from "../context/ProductContext";
+import { IoMdClose } from "react-icons/io";
 
 // Slide Transition
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -10,9 +11,9 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const UpdateProduct = () => {
-  const { setProducts, open, editProduct, setOpen } = useProduct();
+  const { setProducts, open, EditProduct, setOpen } = useProduct();
 
-  const [field, setFiled] = useState("hall");
+  const [field, setField] = useState("hall");
   const initialForm = {
     serviceType: "hall",
     title: "",
@@ -69,8 +70,10 @@ const UpdateProduct = () => {
   };
 
   const [productForm, setProductForm] = useState(initialForm);
+
   const handleform = (e, extra = {}) => {
     const { name, value, type } = e.target || {};
+
     setProductForm((prev) => {
       let updated = { ...prev };
 
@@ -95,16 +98,25 @@ const UpdateProduct = () => {
       if (extra.type === "decorationDetail") {
         const { index, subIndex, field } = extra;
         const themes = [...prev.detailsproduct];
-        themes[index].details[subIndex][field] = value;
-        updated.detailsproduct = themes;
-      }
-      if (extra.type === "descriptionArray") {
-        const { index, subIndex, descIndex, value } = extra;
-        const themes = [...prev.detailsproduct];
-        themes[index].details[subIndex].description[descIndex] = value;
+        if (themes[index] && themes[index].details[subIndex]) {
+          themes[index].details[subIndex][field] = value;
+        }
         updated.detailsproduct = themes;
       }
 
+      if (extra.type === "descriptionArray") {
+        const { index, subIndex, descIndex } = extra;
+        const value = extra.value ?? e.target.value; // Use passed value if exists
+        const themes = [...prev.detailsproduct];
+        if (
+          themes[index] &&
+          themes[index].details[subIndex] &&
+          themes[index].details[subIndex].description[descIndex] !== undefined
+        ) {
+          themes[index].details[subIndex].description[descIndex] = value;
+        }
+        updated.detailsproduct = themes;
+      }
       return updated;
     });
   };
@@ -117,7 +129,6 @@ const UpdateProduct = () => {
     });
   };
 
-  //  Remove sub detail
   const removeSubDetail = (index, subIndex) => {
     setProductForm((prev) => {
       const themes = [...prev.detailsproduct];
@@ -128,7 +139,6 @@ const UpdateProduct = () => {
     });
   };
 
-  //  Add Item
   const addDetailsProduct = () => {
     setProductForm((prev) => ({
       ...prev,
@@ -148,7 +158,6 @@ const UpdateProduct = () => {
     }));
   };
 
-  //  Remove Item
   const removeDetailsProduct = (index) => {
     setProductForm((prev) => {
       const updated = [...prev.detailsproduct];
@@ -157,7 +166,6 @@ const UpdateProduct = () => {
     });
   };
 
-  //  Add Description
   const addDescription = (index, subIndex) => {
     setProductForm((prev) => {
       const themes = [...prev.detailsproduct];
@@ -166,7 +174,6 @@ const UpdateProduct = () => {
     });
   };
 
-  //  Remove Description
   const removeDescription = (index, subIndex, descIndex) => {
     setProductForm((prev) => {
       const themes = [...prev.detailsproduct];
@@ -177,7 +184,6 @@ const UpdateProduct = () => {
     });
   };
 
-  //  Images
   const handleImages = (e) => {
     const files = Array.from(e.target.files);
     setProductForm((prev) => ({
@@ -193,34 +199,67 @@ const UpdateProduct = () => {
     }));
   };
 
-  const roleChange = (value) => {
-    setFiled(value);
+  const serviceTypeChange = (value) => {
+    setField(value);
     setProductForm((prev) => ({ ...prev, serviceType: value }));
   };
-  // CREATE
-  const uploadproduct = async (e) => {
+
+  // UPDATE PRODUCT
+  const updateProduct = async (e) => {
     e.preventDefault();
     const user = JSON.parse(localStorage.getItem("user"));
     const token = user?.token;
     const userId = user?.id;
 
+    if (!EditProduct || !EditProduct._id) {
+      console.error("No product selected for update");
+      return;
+    }
+
     try {
       const formData = new FormData();
+
+      // Append all form data correctly
       Object.entries(productForm).forEach(([key, value]) => {
         if (key === "images") {
-          value.forEach((file) => formData.append("images", file));
+          // Handle images - send both existing and new images
+          value.forEach((file) => {
+            if (file instanceof File) {
+              formData.append("images", file);
+            }
+          });
+
+          // Also send existing images as a JSON array
+          const existingImages = value.filter((img) => !(img instanceof File));
+          if (existingImages.length > 0) {
+            formData.append("existingImages", JSON.stringify(existingImages));
+          }
         } else if (key === "cateringServices") {
-          formData.append("cateringServices", JSON.stringify(value));
+          formData.append(key, JSON.stringify(value));
+        } else if (key === "staff" && Array.isArray(value)) {
+          formData.append(key, JSON.stringify(value));
+        } else if (key === "detailsproduct") {
+          formData.append(key, JSON.stringify(value));
+        } else if (typeof value === "object" && value !== null) {
+          formData.append(key, JSON.stringify(value));
         } else if (Array.isArray(value)) {
           formData.append(key, JSON.stringify(value));
         } else {
-          formData.append(key, value);
+          // For all other fields including empty strings
+          formData.append(
+            key,
+            value !== null && value !== undefined ? value.toString() : ""
+          );
         }
       });
+
+      // Append required fields that might be missing
       formData.append("userId", userId);
 
+      // Debug: Log what's being sent
+
       const { data } = await axios.put(
-        `http://localhost:5000/api/auth/vendor/updatproduct/${editProduct._id}`,
+        `http://localhost:5000/api/auth/vendor/updateproduct/${EditProduct._id}`,
         formData,
         {
           headers: {
@@ -229,54 +268,145 @@ const UpdateProduct = () => {
           },
         }
       );
-      setProducts((prev) => [data.data, ...prev]);
-      setProductForm(initialForm);
 
+      // Update the product in the products list
+      setProducts((prev) =>
+        prev.map((product) =>
+          product._id === EditProduct._id ? data.data : product
+        )
+      );
+
+      setProductForm(initialForm);
       setOpen(false);
+      alert("Product updated successfully!");
     } catch (err) {
-      console.error("Create error:", err.response?.data || err.message);
+      console.error("Update error:", err.response?.data || err.message);
+      console.error("Full error:", err);
+
+      // Show more specific error message
+      if (err.response?.data?.message) {
+        alert(`Failed: ${err.response.data.message}`);
+      } else {
+        alert("Failed to update product. Please check console for details.");
+      }
     }
   };
+
+  // Initialize form with EditProduct data
   useEffect(() => {
-    if (editProduct) {
-      setProductForm((prev) => ({
-        ...initialForm, // default fields
-        ...editProduct, // overwrite with editProduct
-        cateringServices: {
-          ...initialForm.cateringServices,
-          ...editProduct.cateringServices,
-        },
-        detailsproduct:
-          editProduct.detailsproduct || initialForm.detailsproduct,
-      }));
-      setFiled(editProduct.serviceType || "hall");
-    } else {
+    if (!EditProduct) {
       setProductForm(initialForm);
-      setFiled("hall");
+      setField("hall");
+      return;
     }
-    console.log("editProduct inside UpdateProduct:", editProduct);
-  }, [editProduct]);
+
+    // Clean and prepare the EditProduct data
+    const cleanedProduct = {
+      serviceType: EditProduct.serviceType || "hall",
+      title: EditProduct.title || "",
+      description: EditProduct.description || "",
+      images: EditProduct.images || [],
+      hallCapacity: EditProduct.hallCapacity || "",
+      hallPricePerHead: EditProduct.hallPricePerHead || "",
+      hallparking: EditProduct.hallparking || "",
+      hallcatering: EditProduct.hallcatering || "",
+      halldecor: EditProduct.halldecor || "",
+      Location: EditProduct.Location || "",
+      cateringServices: EditProduct.cateringServices || {
+        sound: "",
+        plates: "",
+        seating: "",
+        waiters: "",
+        decoration: "",
+      },
+      cateringminPerHead: EditProduct.cateringminPerHead || "",
+      cateringmaxPerHead: EditProduct.cateringmaxPerHead || "",
+      djRate: EditProduct.djRate || "",
+      djDuration: EditProduct.djDuration || "",
+      venue: EditProduct.venue || "",
+      photographerPackage: EditProduct.photographerPackage || "",
+      photographerStartingRange: EditProduct.photographerStartingRange || "",
+      photographerexpectedRange: EditProduct.photographerexpectedRange || "",
+      adddtionalinformation: EditProduct.adddtionalinformation || "",
+      photographerPrice: EditProduct.photographerPrice || "",
+      decoratorminPrice: EditProduct.decoratorminPrice || "",
+      decoratormaxPrice: EditProduct.decoratormaxPrice || "",
+      decorationtype: EditProduct.decorationtype || "",
+      carType: EditProduct.carType || "",
+      carRentalPrice: EditProduct.carRentalPrice || "",
+      carRentalDuration: EditProduct.carRentalDuration || "",
+      Seats: EditProduct.Seats || "",
+      Door: EditProduct.Door || "",
+      Transmission: EditProduct.Transmission || "",
+      cancellation: EditProduct.cancellation || "",
+      staff:
+        typeof EditProduct.staff === "string"
+          ? JSON.parse(EditProduct.staff)
+          : EditProduct.staff || [],
+      city: EditProduct.city || "",
+      ratings: EditProduct.ratings || "",
+      detailsproduct: EditProduct.detailsproduct?.length
+        ? EditProduct.detailsproduct.map((item) => ({
+            title: item.title || "",
+            price: item.price || "",
+            details: Array.isArray(item.details)
+              ? item.details.map((detail) => ({
+                  title: detail.title || "",
+                  description: Array.isArray(detail.description)
+                    ? detail.description
+                    : [detail.description || ""],
+                }))
+              : [{ title: "", description: [""] }],
+          }))
+        : [
+            {
+              title: "",
+              price: "",
+              details: [
+                {
+                  title: "",
+                  description: [""],
+                },
+              ],
+            },
+          ],
+    };
+
+    setProductForm(cleanedProduct);
+    setField(cleanedProduct.serviceType);
+  }, [EditProduct]);
+
+  // Handle staff input as comma-separated values
+  const handleStaffInput = (e) => {
+    const value = e.target.value
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s !== "");
+    setProductForm((prev) => ({ ...prev, staff: value }));
+  };
 
   return (
     <>
-      {/* Dialog */}
       <Dialog
         open={open}
         TransitionComponent={Transition}
         keepMounted
         onClose={() => setOpen(false)}
         aria-describedby="add-product"
+        maxWidth="sm"
+        fullWidth
       >
-        <div className="p-6 w-[320px] sm:w-[460px]">
+        <div className="p-6 w-full max-w-md mx-auto">
           <h2 className="text-xl font-semibold mb-4 text-center">
             Edit Product
           </h2>
-          <form className="flex flex-col gap-4" onSubmit={uploadproduct}>
+          <form className="flex flex-col gap-4" onSubmit={updateProduct}>
             {/* Service Type */}
             <select
               value={field}
-              onChange={(e) => roleChange(e.target.value)}
+              onChange={(e) => serviceTypeChange(e.target.value)}
               className="border rounded-lg p-2 outline-none"
+              required
             >
               <option value="">Select Service Type</option>
               <option value="hall">Hall</option>
@@ -284,7 +414,7 @@ const UpdateProduct = () => {
               <option value="dj">DJ</option>
               <option value="photographers">Photographers</option>
               <option value="decorators">Decorators</option>
-              <option value="carRental">CarRental</option>
+              <option value="carRental">Car Rental</option>
             </select>
 
             <input
@@ -294,7 +424,9 @@ const UpdateProduct = () => {
               value={productForm.title}
               placeholder="Product Name"
               className="border rounded-lg p-2 outline-none"
+              required
             />
+
             <textarea
               onChange={handleform}
               name="description"
@@ -302,7 +434,9 @@ const UpdateProduct = () => {
               placeholder="Description"
               className="border rounded-lg p-2 outline-none resize-none"
               rows={3}
+              required
             />
+
             <input
               type="text"
               onChange={handleform}
@@ -326,13 +460,24 @@ const UpdateProduct = () => {
                 {productForm.images.map((img, index) => (
                   <div key={index} className="relative">
                     <img
-                      src={URL.createObjectURL(img)}
+                      src={
+                        img instanceof File
+                          ? URL.createObjectURL(img) // New uploads
+                          : img.startsWith("http")
+                          ? img // Absolute URL (if backend already sends full URL)
+                          : `http://localhost:5000/${img}` // Existing image filenames
+                      }
                       alt="preview"
                       className="w-20 h-20 object-cover rounded-lg border"
                     />
                     <button
                       type="button"
-                      onClick={() => removeImage(index)}
+                      onClick={() =>
+                        setProductForm((prev) => ({
+                          ...prev,
+                          images: prev.images.filter((_, i) => i !== index),
+                        }))
+                      }
                       className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center"
                     >
                       ✕
@@ -345,22 +490,6 @@ const UpdateProduct = () => {
             {/* Hall fields */}
             {field === "hall" && (
               <>
-                <input
-                  type="text"
-                  onChange={handleform}
-                  name="hallparking"
-                  value={productForm.hallparking}
-                  placeholder="Hall parking capacity"
-                  className="border rounded-lg p-2 outline-none"
-                />
-                <input
-                  type="text"
-                  onChange={handleform}
-                  name="hallcatering"
-                  value={productForm.hallcatering}
-                  placeholder="Hall internal "
-                  className="border rounded-lg p-2 outline-none"
-                />
                 <input
                   type="text"
                   onChange={handleform}
@@ -380,12 +509,27 @@ const UpdateProduct = () => {
                 <input
                   type="text"
                   onChange={handleform}
+                  name="hallparking"
+                  value={productForm.hallparking}
+                  placeholder="Hall parking capacity"
+                  className="border rounded-lg p-2 outline-none"
+                />
+                <input
+                  type="text"
+                  onChange={handleform}
+                  name="hallcatering"
+                  value={productForm.hallcatering}
+                  placeholder="Hall internal catering"
+                  className="border rounded-lg p-2 outline-none"
+                />
+                <input
+                  type="text"
+                  onChange={handleform}
                   name="halldecor"
                   value={productForm.halldecor}
                   placeholder="Hall flower decor starts from"
                   className="border rounded-lg p-2 outline-none"
                 />
-
                 <select
                   name="venue"
                   value={productForm.venue}
@@ -402,19 +546,13 @@ const UpdateProduct = () => {
                   onChange={handleform}
                   name="cancellation"
                   value={productForm.cancellation}
-                  placeholder="Photographer Cancellation Policy"
+                  placeholder="Cancellation Policy"
                   className="border rounded-lg p-2 outline-none"
                 />
                 <input
                   type="text"
-                  onChange={(e) => {
-                    const value = e.target.value
-                      .split(",")
-                      .map((s) => s.trim());
-                    setProductForm((prev) => ({ ...prev, staff: value }));
-                  }}
+                  onChange={handleStaffInput}
                   value={productForm.staff.join(", ")}
-                  name="staff"
                   placeholder="Enter staff (e.g. Male, Female)"
                   className="border rounded-lg p-2 outline-none"
                 />
@@ -441,83 +579,73 @@ const UpdateProduct = () => {
                   placeholder="Catering Max Price Per Head"
                   className="border rounded-lg p-2 outline-none"
                 />
-                <label htmlFor="">Sounds</label>{" "}
+                <label className="block font-medium">Sounds</label>
                 <select
                   name="sound"
                   value={productForm.cateringServices.sound || ""}
                   onChange={(e) => handleform(e, { type: "catering" })}
-                  id=""
+                  className="border rounded-lg p-2 outline-none w-full"
                 >
-                  {" "}
-                  <option value="">Option Select</option>{" "}
-                  <option value="true">Yes</option>{" "}
-                  <option value="false">No</option>{" "}
-                </select>{" "}
-                <label htmlFor="">Plates</label>{" "}
+                  <option value="">Select Option</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+                <label className="block font-medium">Plates</label>
                 <select
                   name="plates"
                   value={productForm.cateringServices.plates || ""}
                   onChange={(e) => handleform(e, { type: "catering" })}
-                  id=""
+                  className="border rounded-lg p-2 outline-none w-full"
                 >
-                  {" "}
-                  <option value="">Option Select</option>{" "}
-                  <option value="true">Yes</option>{" "}
-                  <option value="false">No</option>{" "}
-                </select>{" "}
-                <label htmlFor="">Seating</label>{" "}
+                  <option value="">Select Option</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+                <label className="block font-medium">Seating</label>
                 <select
                   name="seating"
                   value={productForm.cateringServices.seating || ""}
                   onChange={(e) => handleform(e, { type: "catering" })}
-                  id=""
+                  className="border rounded-lg p-2 outline-none w-full"
                 >
-                  {" "}
-                  <option value="">Option Select</option>{" "}
-                  <option value="true">Yes</option>{" "}
-                  <option value="false">No</option>{" "}
-                </select>{" "}
-                <label htmlFor="">Waiters</label>{" "}
+                  <option value="">Select Option</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+                <label className="block font-medium">Waiters</label>
                 <select
                   name="waiters"
                   value={productForm.cateringServices.waiters || ""}
                   onChange={(e) => handleform(e, { type: "catering" })}
-                  id=""
+                  className="border rounded-lg p-2 outline-none w-full"
                 >
-                  {" "}
-                  <option value="">Option Select</option>{" "}
-                  <option value="true">Yes</option>{" "}
-                  <option value="false">No</option>{" "}
-                </select>{" "}
-                <label htmlFor="">Decoration</label>{" "}
+                  <option value="">Select Option</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+                <label className="block font-medium">Decoration</label>
                 <select
                   name="decoration"
                   value={productForm.cateringServices.decoration || ""}
                   onChange={(e) => handleform(e, { type: "catering" })}
-                  id=""
+                  className="border rounded-lg p-2 outline-none w-full"
                 >
-                  <option value="">Option Select</option>{" "}
-                  <option value="true">Yes</option>{" "}
-                  <option value="false">No</option>{" "}
+                  <option value="">Select Option</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
                 </select>
                 <input
                   type="text"
                   onChange={handleform}
                   name="cancellation"
                   value={productForm.cancellation}
-                  placeholder="Catering Cancellation Policy"
+                  placeholder="Cancellation Policy"
                   className="border rounded-lg p-2 outline-none"
                 />
                 <input
                   type="text"
-                  onChange={(e) => {
-                    const value = e.target.value
-                      .split(",")
-                      .map((s) => s.trim());
-                    setProductForm((prev) => ({ ...prev, staff: value }));
-                  }}
+                  onChange={handleStaffInput}
                   value={productForm.staff.join(", ")}
-                  name="staff"
                   placeholder="Enter staff (e.g. Male, Female)"
                   className="border rounded-lg p-2 outline-none"
                 />
@@ -573,26 +701,18 @@ const UpdateProduct = () => {
                   placeholder="Photographer Expected Price"
                   className="border rounded-lg p-2 outline-none"
                 />
-
                 <input
                   type="text"
                   onChange={handleform}
                   name="cancellation"
                   value={productForm.cancellation}
-                  placeholder="Photographer Cancellation Policy"
+                  placeholder="Cancellation Policy"
                   className="border rounded-lg p-2 outline-none"
                 />
-
                 <input
                   type="text"
-                  onChange={(e) => {
-                    const value = e.target.value
-                      .split(",")
-                      .map((s) => s.trim());
-                    setProductForm((prev) => ({ ...prev, staff: value }));
-                  }}
+                  onChange={handleStaffInput}
                   value={productForm.staff.join(", ")}
-                  name="staff"
                   placeholder="Enter staff (e.g. Male, Female)"
                   className="border rounded-lg p-2 outline-none"
                 />
@@ -631,19 +751,13 @@ const UpdateProduct = () => {
                   onChange={handleform}
                   name="cancellation"
                   value={productForm.cancellation}
-                  placeholder="Decorator Cancellation Policy"
+                  placeholder="Cancellation Policy"
                   className="border rounded-lg p-2 outline-none"
                 />
                 <input
                   type="text"
-                  onChange={(e) => {
-                    const value = e.target.value
-                      .split(",")
-                      .map((s) => s.trim());
-                    setProductForm((prev) => ({ ...prev, staff: value }));
-                  }}
+                  onChange={handleStaffInput}
                   value={productForm.staff.join(", ")}
-                  name="staff"
                   placeholder="Enter staff (e.g. Male, Female)"
                   className="border rounded-lg p-2 outline-none"
                 />
@@ -704,6 +818,7 @@ const UpdateProduct = () => {
               </>
             )}
 
+            {/* Details Section - for applicable service types */}
             {(field === "hall" ||
               field === "catering" ||
               field === "photographers" ||
@@ -713,7 +828,7 @@ const UpdateProduct = () => {
                 {productForm.detailsproduct.map((item, index) => (
                   <div
                     key={index}
-                    className="border p-3 rounded-lg mb-3p bg-gray-50"
+                    className="border p-3 rounded-lg mb-3 bg-gray-50"
                   >
                     <input
                       type="text"
@@ -801,7 +916,6 @@ const UpdateProduct = () => {
                       </div>
                     ))}
 
-                    {/* 👉 Add Subtitle button yaha aayega */}
                     <button
                       type="button"
                       onClick={() => addSubDetail(index)}
@@ -813,7 +927,7 @@ const UpdateProduct = () => {
                     <button
                       type="button"
                       onClick={() => removeDetailsProduct(index)}
-                      className="ml-2 px-3  cursor-pointer  py-1 bg-red-600 text-white rounded text-sm"
+                      className="ml-2 px-3 cursor-pointer py-1 bg-red-600 text-white rounded text-sm"
                     >
                       Remove Item
                     </button>
@@ -822,12 +936,13 @@ const UpdateProduct = () => {
                 <button
                   type="button"
                   onClick={addDetailsProduct}
-                  className="px-4 py-2 cursor-pointer  bg-blue-600 text-white rounded mt-2"
+                  className="px-4 py-2 cursor-pointer bg-blue-600 text-white rounded mt-2"
                 >
                   Add Item
                 </button>
               </>
             )}
+
             {/* Common Fields */}
             <input
               type="text"
@@ -852,6 +967,9 @@ const UpdateProduct = () => {
               value={productForm.ratings}
               placeholder="Enter ratings point"
               className="border rounded-lg p-2 outline-none"
+              min="0"
+              max="5"
+              step="0.1"
             />
 
             {/* Buttons */}
@@ -867,7 +985,7 @@ const UpdateProduct = () => {
                 type="submit"
                 className="px-4 py-2 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
               >
-                Save
+                Update Product
               </button>
             </div>
           </form>

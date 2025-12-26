@@ -1,7 +1,7 @@
 import Booking from "../model/Booking.js";
 import Vendor from "../model/vendor.js";
 import User from "../model/User12.js";
-// ✅ Create Booking
+// Create Booking
 export const createBooking = async (req, res) => {
   try {
     const {
@@ -16,7 +16,7 @@ export const createBooking = async (req, res) => {
       specialRequests,
     } = req.body;
 
-    // ✅ check required fields
+    //  check required fields
     if (
       !user ||
       !vendor ||
@@ -28,19 +28,19 @@ export const createBooking = async (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // ✅ check user exists
+    //  check user exists
     const existingUser = await User.findById(user);
     if (!existingUser) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // ✅ check vendor exists
+    //  check vendor exists
     const existingVendor = await Vendor.findById(vendor);
     if (!existingVendor) {
       return res.status(404).json({ message: "Vendor not found" });
     }
 
-    // ✅ create booking
+    //  create booking
     const newBooking = new Booking({
       user,
       vendor,

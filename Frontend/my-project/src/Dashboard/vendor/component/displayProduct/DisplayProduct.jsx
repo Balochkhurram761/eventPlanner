@@ -9,7 +9,7 @@ const DisplayProduct = () => {
     setSearchQuery,
     setEditProduct,
     EditProduct,
-
+    open,
     setOpen,
     products,
     setProducts,
@@ -100,6 +100,7 @@ const DisplayProduct = () => {
                     <td className="px-6 py-4">
                       <button
                         onClick={() => {
+                          // console.log("hello", EditProduct);
                           setEditProduct(item);
                           setOpen(true);
                         }}

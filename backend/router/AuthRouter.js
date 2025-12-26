@@ -10,7 +10,7 @@ import {
   fetchdata,
   getdata,
   getone,
-  updateProduct,
+  ProductUpdate,
   UploadProduct,
 } from "../controller/Vendor.js";
 import { authorizeRoles, tokenverify } from "../middleware/AuthMiddleWares.js";
@@ -58,11 +58,11 @@ router.delete(
   deleteproduct
 );
 router.put(
-  "/vendor/updatproduct/:id",
+  "/vendor/updateproduct/:id",
+  upload.array("images"),
   tokenverify,
   authorizeRoles("vendor", "admin"),
-  upload.none(),
-  updateProduct
+  ProductUpdate
 );
 
 // getdata all in fronted

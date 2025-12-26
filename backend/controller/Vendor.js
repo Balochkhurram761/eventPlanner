@@ -59,7 +59,6 @@ export const UploadProduct = async (req, res) => {
       description,
       images: req.files?.map((file) => file.path) || [],
 
-      // hall fields
       venue,
       hallCapacity,
       hallPricePerHead,
@@ -175,11 +174,47 @@ export const deleteproduct = async (req, res) => {
   }
 };
 
-export const updateProduct = async (req, res) => {
-  try {
-    const productId = req.params.id;
-    const updateFields = req.body;
+export const ProductUpdate = async (req, res) => {
+  const productId = req.params.id;
 
+  try {
+    // Parse JSON fields from FormData
+    const detailsproduct = req.body.detailsproduct
+      ? JSON.parse(req.body.detailsproduct)
+      : [];
+    const staff = req.body.staff
+      ? Array.isArray(req.body.staff)
+        ? JSON.stringify(req.body.staff)
+        : req.body.staff
+      : "[]";
+    const cateringServices = req.body.cateringServices
+      ? JSON.parse(req.body.cateringServices)
+      : {};
+    const existingImages = req.body.existingImages
+      ? JSON.parse(req.body.existingImages)
+      : [];
+
+    // Combine new uploaded files with existing images
+    const images = [
+      ...existingImages,
+      ...(req.files
+        ? req.files.map((f) => `uploads/${f.filename}`) // <- relative path
+        : []),
+    ];
+
+    // Build the update object
+    const updateFields = {
+      ...req.body,
+      detailsproduct,
+      staff,
+      cateringServices,
+      images,
+    };
+
+    // Remove fields that were JSON strings (avoid double stringification)
+    delete updateFields.existingImages;
+
+    // Update the product
     const updatedData = await Vendor.findByIdAndUpdate(
       productId,
       { $set: updateFields },
@@ -189,17 +224,17 @@ export const updateProduct = async (req, res) => {
     if (!updatedData) {
       return res.status(404).json({
         success: false,
-        message: "Product not found ",
+        message: "Product not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      message: "Product updated successfully ",
+      message: "Product updated successfully",
       data: updatedData,
     });
   } catch (error) {
-    console.error("updateProduct Error:", error.message);
+    console.error("updateProduct Error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to update product",
