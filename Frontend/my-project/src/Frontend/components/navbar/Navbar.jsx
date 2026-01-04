@@ -50,7 +50,7 @@ const Navbar = () => {
                 {openDropdown === "venues" && (
                   <ul className="absolute top-full mt-2 w-48 bg-white shadow-lg rounded-lg overflow-hidden">
                     <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
-                      <Link to="/hall/BanquetHall">Banquet Halls</Link>
+                      <Link to="hall/BanquetHall">Banquet Halls</Link>
                     </li>
                     <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
                       <Link to="/hall/OutdoorGarden">Outdoor Gardens</Link>
@@ -86,7 +86,7 @@ const Navbar = () => {
                       <Link to="/carRental">Car Rental</Link>
                     </li>
                     <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
-                      <Link to="/dj">dj </Link>
+                      <Link to="/dj">Dj </Link>
                     </li>
                   </ul>
                 )}

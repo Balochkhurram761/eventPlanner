@@ -136,7 +136,6 @@ export const getAllUser = async (req, res) => {
   }
 };
 
-
 // Update user approval status
 export const updatestatus = async (req, res) => {
   const { userId } = req.params;
@@ -162,7 +161,7 @@ export const updatestatus = async (req, res) => {
   }
 };
 
-export const update = async (req, res) => {
+export const updateuser = async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body; // get updated fields from request body
