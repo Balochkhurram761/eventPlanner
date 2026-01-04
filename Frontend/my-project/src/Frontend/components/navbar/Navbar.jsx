@@ -6,7 +6,6 @@ import { FiMenu, FiX } from "react-icons/fi";
 import MobileNavbar from "./MobileNavbar";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState("");
 
   return (
     <>
@@ -33,11 +32,7 @@ const Navbar = () => {
                 </Link>
               </li>
 
-              <li
-                className="relative cursor-pointer"
-                onMouseEnter={() => setOpenDropdown("venues")}
-                onMouseLeave={() => setOpenDropdown("")}
-              >
+              <li className="relative cursor-pointer block group">
                 <div className="flex items-center gap-1 hover:text-pink-600 transition-colors duration-300">
                   <Link
                     to="/hall"
@@ -47,49 +42,60 @@ const Navbar = () => {
                     Venues <IoIosArrowDown />
                   </Link>
                 </div>
-                {openDropdown === "venues" && (
-                  <ul className="absolute top-full mt-2 w-48 bg-white shadow-lg rounded-lg overflow-hidden">
-                    <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
-                      <Link to="hall/BanquetHall">Banquet Halls</Link>
-                    </li>
-                    <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
-                      <Link to="/hall/OutdoorGarden">Outdoor Gardens</Link>
-                    </li>
-                    <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
-                      <Link to="/hall/Resort">Resorts</Link>
-                    </li>
-                  </ul>
-                )}
+
+                <ul className="absolute top-full mt-0 w-48 bg-white shadow-lg rounded-lg overflow-hidden hidden group-hover:block">
+                  <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
+                    <Link to="/hall/BanquetHall" className="w-full block">
+                      Banquet Halls
+                    </Link>
+                  </li>
+                  <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
+                    <Link to="/hall/OutdoorGarden" className="w-full block">
+                      Outdoor Gardens
+                    </Link>
+                  </li>
+                  <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
+                    <Link to="/hall/Resort" className="w-full block">
+                      Resorts
+                    </Link>
+                  </li>
+                </ul>
               </li>
 
               {/* Vendor Dropdown */}
-              <li
-                className="relative cursor-pointer"
-                onMouseEnter={() => setOpenDropdown("vendor")}
-                onMouseLeave={() => setOpenDropdown("")}
-              >
+              <li className="relative cursor-pointer  block  group ">
                 <div className="flex items-center gap-1 hover:text-pink-600 transition-colors duration-300">
                   Vendor <IoIosArrowDown />
                 </div>
-                {openDropdown === "vendor" && (
-                  <ul className="absolute top-full mt-2 w-48 bg-white shadow-lg rounded-lg overflow-hidden">
-                    <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
-                      <Link to="/photographers">Photographers</Link>
-                    </li>
-                    <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
-                      <Link to="/catering">Caterers</Link>
-                    </li>
-                    <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
-                      <Link to="/decorators">Decorators</Link>
-                    </li>
-                    <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
-                      <Link to="/carRental">Car Rental</Link>
-                    </li>
-                    <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
-                      <Link to="/dj">Dj </Link>
-                    </li>
-                  </ul>
-                )}
+
+                <ul className="absolute  top-full mt-0 w-48 bg-white shadow-lg rounded-lg overflow-hidden  hidden group-hover:block">
+                  <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
+                    <Link to="/photographers" className="block w-full">
+                      Photographers
+                    </Link>
+                  </li>
+                  <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
+                    <Link to="/catering" className="block w-full">
+                      Caterers
+                    </Link>
+                  </li>
+                  <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
+                    <Link to="/decorators" className="block w-full">
+                      Decorators
+                    </Link>
+                  </li>
+                  <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
+                    <Link to="/carRental" className="block w-full">
+                      Car Rental
+                    </Link>
+                  </li>
+
+                  <li className="px-4 py-2 hover:bg-pink-50 hover:text-pink-600">
+                    <Link to="/dj" className="block w-full">
+                      DJ{" "}
+                    </Link>
+                  </li>
+                </ul>
               </li>
               <li>
                 <Link

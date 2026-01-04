@@ -19,7 +19,7 @@ const products = [
   {
     link: "/catering",
     image: "../src/assets/herosection/catering.jpg",
-    title: "catering",
+    title: "Catering",
   },
   {
     link: "/carRental",
