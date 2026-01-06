@@ -24,8 +24,9 @@ const App = () => {
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/chat" element={<AiPlanner />} />
-        <Route path="/:serviceType/:id" element={<ProductUiDesc />} />
+      
         <Route path="/:serviceType/:venue/:id" element={<ProductUiDesc />} />
+        {/* <Route path="/:serviceType/:id" element={<ProductUiDesc />} /> */}
         <Route path="/:serviceType/:venue" element={<ProductUI />} />
         <Route path="/:serviceType" element={<ProductUI />} />
 

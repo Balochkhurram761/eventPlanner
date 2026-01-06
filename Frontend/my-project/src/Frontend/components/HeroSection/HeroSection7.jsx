@@ -8,13 +8,12 @@ import "swiper/css/pagination";
 
 import { Autoplay, Pagination } from "swiper/modules";
 import { useProduct } from "../../context/ProductContext";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const HeroSection7 = () => {
   const { fetchProducts } = useProduct();
   const [products, setProducts] = useState([]);
-  const [city, setCity] = useState("Lahore"); // ✅ default Lahore
-  const { serviceType, id } = useParams();
+  const [city, setCity] = useState("Lahore"); //  default Lahore
   useEffect(() => {
     const loadData = async () => {
       const data = await fetchProducts({
@@ -66,7 +65,7 @@ const HeroSection7 = () => {
         {products && products.length > 0 ? (
           products.map((item) => (
             <SwiperSlide key={item._id}>
-              <Link to={`${item.serviceType}/${item._id}`}>
+              <Link to={`${item.serviceType}/product/${item._id}`}>
                 <div className="outline-none rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                   <img
                     src={`http://localhost:5000/${item.images[0]}`}

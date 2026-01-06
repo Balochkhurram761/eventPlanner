@@ -510,7 +510,7 @@ const ProductUiDesc = () => {
   // Helper function to render package selection (for services that have detailsproduct)
   const renderPackageSelection = () => {
     if (!product.detailsproduct || product.detailsproduct.length === 0) {
-      return null; // ❌ hide whole package section if no package exists
+      return null; //  hide whole package section if no package exists
     }
 
     const needsPersonCounter = product.serviceType === "catering";

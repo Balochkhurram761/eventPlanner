@@ -33,14 +33,14 @@ const Register = () => {
           values
         );
         if (res.data.success) {
-          toast.success(res.data.message || "Registration successful 🎉");
+          toast.success(res.data.message || "Registration successful ");
           resetForm();
         } else {
-          toast.error(res.data.message || "Something went wrong ❌");
+          toast.error(res.data.message || "Something went wrong ");
         }
       } catch (err) {
         if (err.response) {
-          toast.error(err.response.data.message || "Server error ❌");
+          toast.error(err.response.data.message || "Server error ");
         } else {
           toast.error("Error: " + err.message);
         }

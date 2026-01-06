@@ -13,7 +13,7 @@ import { Link } from "react-router-dom";
 const HeroSection3 = () => {
   const { fetchProducts } = useProduct();
   const [products, setProducts] = useState([]);
-  const [city, setCity] = useState("Lahore"); // ✅ default Lahore
+  const [city, setCity] = useState("Lahore"); //  default Lahore
 
   useEffect(() => {
     const loadData = async () => {
@@ -68,7 +68,7 @@ const HeroSection3 = () => {
               <Link to={`/${item.serviceType}/${item._id}`}>
                 <div className="bg-white my-2.5 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                   <img
-                    src={`http://localhost:5000/${item.images[0]}`}
+                    src={`http://localhost:5000/product/${item.images[0]}`}
                     alt={item.title}
                     className="w-full h-48 object-cover"
                   />

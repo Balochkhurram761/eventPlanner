@@ -12,8 +12,8 @@ const SideBar = () => {
   const menuItems = [
     { name: "Dashboard", path: "/dashboard/vendor", icon: <IoHomeOutline /> },
     { name: "Products", path: "/vendor/products", icon: <MdShoppingCart /> },
-    // { name: "Products", path: "/admin/products", icon: "📦" },
-    // { name: "Orders", path: "/admin/orders", icon: "🧾" },
+    // { name: "Products", path: "/admin/products", icon: "" },
+    // { name: "Orders", path: "/admin/orders", icon: "" },
     { name: "Settings", path: "/admin/settings", icon: <CiSettings /> },
   ];
 

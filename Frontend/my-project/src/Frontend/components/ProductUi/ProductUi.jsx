@@ -64,7 +64,7 @@ const ProductUI = () => {
                   to={
                     product.venue
                       ? `/${product.serviceType}/${product.venue}/${product._id}`
-                      : `/${product.serviceType}/${product._id}`
+                      : `/${product.serviceType}/product/${product._id}`
                   }
                 >
                   <div className="img w-full ">
