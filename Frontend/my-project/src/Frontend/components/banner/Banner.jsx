@@ -8,7 +8,7 @@ const HeroSection = () => {
 
   // Filter state
   const [filter, setFilter] = useState({
-    username: "",
+     businessName: "",
     serviceType: "",
     location: "",
   });
@@ -18,9 +18,9 @@ const HeroSection = () => {
 
     // Optional: fetch data before navigating
     await fetchProducts(filter);
-
+    
     const params = new URLSearchParams();
-    if (filter.username) params.append("username", filter.username);
+    if (filter.businessName) params.append("username", filter.businessName);
     if (filter.serviceType) params.append("serviceType", filter.serviceType);
     if (filter.location) params.append("location", filter.location);
 
@@ -40,9 +40,9 @@ const HeroSection = () => {
             <input
               type="text"
               placeholder="Vendor Name"
-              value={filter.username}
+              value={filter.businessName}
               onChange={(e) =>
-                setFilter({ ...filter, username: e.target.value })
+                setFilter({ ...filter,  businessName: e.target.value })
               }
               className="w-full border border-gray-300 rounded-md p-3"
             />

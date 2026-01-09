@@ -1,25 +1,36 @@
 import React from "react";
 import Searchbar from "../search/Search";
 import ProfileView from "../profileView/ProfileView";
-import { CiMenuBurger } from "react-icons/ci";
+import { HiMenuAlt2 } from "react-icons/hi"; // Thora better icon
 import { useNavbar } from "../../../../Frontend/context/NavbarContext";
 
 const NavbarAdmin = () => {
   const { handlenavbar } = useNavbar();
 
   return (
-    <div className="w-full  h-16 bg-gray-900 text-white flex justify-between items-center px-6 shadow-md fixed top-0 left-0 z-50">
-      <div className="menu text-2xl block cursor-pointer lg:hidden text-white outline-none border-none">
-        <CiMenuBurger onClick={handlenavbar} />
+    <div className="w-full h-16 bg-white border-b border-gray-200 flex justify-between items-center px-4 md:px-8 fixed top-0 left-0 z-50">
+      {/* Mobile Menu & Logo */}
+      <div className="flex items-center gap-4">
+        <button 
+          onClick={handlenavbar}
+          className="p-2 rounded-lg hover:bg-gray-100 lg:hidden text-gray-600 transition-colors"
+        >
+          <HiMenuAlt2 size={24} />
+        </button>
+        
+        <h1 className="text-xl font-black tracking-tight text-gray-800">
+          <span className="text-red-500">Wed</span>Event
+          <span className="ml-1 text-[10px] bg-red-50 text-red-500 px-1.5 py-0.5 rounded uppercase tracking-widest font-bold">Admin</span>
+        </h1>
       </div>
-      <h1 className="text-xl hidden lg:block font-semibold">
-        <span className="text-red-500 font-bold"> Wed</span>Event
-      </h1>
 
-      <div className="searchbar">
+      {/* Search Section */}
+      <div className="hidden z-50 sm:block flex-1 max-w-md mx-10">
         <Searchbar />
       </div>
-      <div className="logout">
+
+      {/* Profile Section */}
+      <div className="flex items-center gap-3">
         <ProfileView />
       </div>
     </div>

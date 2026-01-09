@@ -227,6 +227,175 @@ export const generateDeals = async (req, res) => {
 };
 
 
+import dotenv from "dotenv";
+import Vendor from "../model/vendor.js";
+
+dotenv.config();
+
+// -------------------- 1. AI Entity Extractor (Fixed Logic) --------------------
+async function extractEntitiesWithAI(prompt) {
+  try {
+    const resp = await fetch("http://localhost:11434/api/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "llama3", // Agar download ho gaya hai toh 'llama3' likhen warna purana wala
+        prompt: `[INST] Strictly extract data from this text: "${prompt}"
+        Return JSON ONLY: {"budget": number, "guests": number, "city": "string", "services": []}
+        Rules: 
+        - Services must ONLY be from: [dj, hall, catering, photographers, decorators, carrental]
+        - If the user says "car", use "carrental".
+        - ONLY include services mentioned in the prompt. [/INST]`,
+        stream: false,
+        options: { temperature: 0, num_ctx: 1024 },
+        format: "json",
+      }),
+    });
+
+    const data = await resp.json();
+    let parsed = JSON.parse(data.response);
+
+    // 🔹 RE-FORMATTER: Agar AI objects bhej de toh strings mein convert karein
+    if (parsed.services && typeof parsed.services[0] === 'object') {
+      parsed.services = parsed.services.map(s => s.name || s.service || s);
+    }
+
+    // 🔹 FIXED SAFETY NET: Sirf wahi add karein jo prompt mein hai
+    if (!parsed || Object.keys(parsed).length === 0 || !parsed.services.length) {
+      console.log("AI failed, running Manual Extraction...");
+      const lowPrompt = prompt.toLowerCase();
+      parsed = {
+        budget: parseInt(prompt.match(/\d+/)?.[0]) || 0,
+        city: lowPrompt.includes("lahore") ? "Lahore" : (lowPrompt.includes("karachi") ? "Karachi" : "Lahore"),
+        services: [],
+        guests: parseInt(prompt.match(/(\d+)\s*guest/)?.[1]) || 1
+      };
+      
+      // Strict Mapping: Sirf wahi mangen jo user ne likha hai
+      if (lowPrompt.includes("dj")) parsed.services.push("dj");
+      if (lowPrompt.includes("photo")) parsed.services.push("photographers");
+      if (lowPrompt.includes("car")) parsed.services.push("carrental");
+      if (lowPrompt.includes("hall")) parsed.services.push("hall");
+      if (lowPrompt.includes("catering")) parsed.services.push("catering");
+      if (lowPrompt.includes("decor")) parsed.services.push("decorators");
+    }
+
+    // "car" ko hamesha "carrental" mein convert karein
+    parsed.services = parsed.services.map(s => s === "car" ? "carrental" : s.toLowerCase());
+
+    console.log("--- FINAL CLEANED DATA ---", parsed);
+    return parsed;
+  } catch (err) {
+    console.error("AI Error:", err.message);
+    return null;
+  }
+}
+
+// -------------------- 2. Helper: Price Calculation --------------------
+function getVendorPrice(vendor, guests) {
+  const service = (vendor.serviceType || vendor.service || "").toLowerCase();
+  const g = guests || 1;
+
+  if (service.includes("hall")) return (vendor.hallPricePerHead || 0) * g;
+  if (service.includes("catering")) return (vendor.cateringminPerHead || 0) * g;
+  if (service.includes("dj")) return vendor.djRate || 0;
+  if (service.includes("photo")) return vendor.photographerStartingRange || vendor.photographerexpectedRange || 0;
+  if (service.includes("decor")) return vendor.decoratorminPrice || 0;
+  if (service.includes("car")) return vendor.carRentalPrice || 0;
+  return 0;
+}
+
+// -------------------- 3. Helper: Combine Vendors --------------------
+function combineVendors(lists) {
+  if (lists.length === 0) return [[]];
+  const [first, ...rest] = lists;
+  const restCombos = combineVendors(rest);
+  const result = [];
+  for (const v of first) {
+    for (const r of restCombos) {
+      result.push([v, ...r]);
+    }
+  }
+  return result;
+}
+
+// -------------------- 4. Main Controller --------------------
+export const generateDeals = async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    const extracted = await extractEntitiesWithAI(prompt);
+
+    if (!extracted || !extracted.services.length) {
+      return res.status(400).json({ success: false, message: "Please mention at least one service." });
+    }
+
+    const { budget, guests, services, city } = extracted;
+    const gCount = guests || 1;
+
+    // Database Search
+    const locationRegex = new RegExp(city, "i");
+    const serviceRegexList = services.map((s) => new RegExp(`^${s}$|${s}`, "i"));
+
+    const vendors = await Vendor.find({
+      $and: [
+        {
+          $or: [
+            { serviceType: { $in: serviceRegexList } },
+            { service: { $in: serviceRegexList } },
+          ],
+        },
+        { $or: [{ location: locationRegex }, { city: locationRegex }] },
+      ],
+    }).lean();
+
+    // Grouping
+    const vendorsByService = services.map((s) => {
+      return vendors.filter((v) => {
+        const vType = (v.serviceType || v.service || "").toLowerCase();
+        return vType.includes(s.toLowerCase());
+      });
+    }).filter(list => list.length > 0);
+
+    // Combination validation
+    if (vendorsByService.length < services.length) {
+      return res.status(200).json({
+        success: false,
+        message: "Kuch services ke vendors nahi mile.",
+        extracted_data: extracted
+      });
+    }
+
+    const allPossibleCombos = combineVendors(vendorsByService);
+
+    // Final Mapping and Budget Filter
+    let finalDeals = allPossibleCombos.map((combo) => {
+      const total = combo.reduce((sum, v) => sum + getVendorPrice(v, gCount), 0);
+      return {
+        totalPrice: total,
+        vendors: combo.map((v) => ({
+          name: v.name || v.vendorName || v.title,
+          service: v.serviceType || v.service,
+          price: getVendorPrice(v, gCount),
+          vendor: v 
+        })),
+      };
+    })
+    .filter((d) => !budget || d.totalPrice <= budget) 
+    .sort((a, b) => a.totalPrice - b.totalPrice);
+
+    res.status(200).json({
+      success: true,
+      extracted_data: extracted,
+      deals: finalDeals.slice(0, 5),
+      message: finalDeals.length === 0 ? "Koi deal budget mein nahi mili." : ""
+    });
+
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+
 
 
 

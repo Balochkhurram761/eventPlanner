@@ -218,7 +218,7 @@ export const ProductUpdate = async (req, res) => {
     const updatedData = await Vendor.findByIdAndUpdate(
       productId,
       { $set: updateFields },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true } //mongoose validator check
     );
 
     if (!updatedData) {
@@ -247,7 +247,7 @@ export const ProductUpdate = async (req, res) => {
 
 export const getdata = async (req, res) => {
   try {
-    const { serviceType, venue, city, search, username, maxPrice } = req.query;
+    const { serviceType, venue, city, search, businessName, maxPrice } = req.query;
 
     let filter = {};
 
@@ -267,8 +267,8 @@ export const getdata = async (req, res) => {
 
     //  Vendor name filter (populate se)
     let userFilter = {};
-    if (username) {
-      userFilter.name = { $regex: username, $options: "i" }; // username → name
+    if (businessName) {
+      userFilter.name = { $regex: businessName, $options: "i" }; // username → name
     }
 
     //  Sab vendors fetch karo with user populated
@@ -344,3 +344,7 @@ export const getone = async (req, res) => {
     });
   }
 };
+
+
+
+

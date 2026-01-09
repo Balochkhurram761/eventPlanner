@@ -12,10 +12,11 @@ export const ProductProvider = ({ children }) => {
 
       if (filters?.serviceType)
         params.append("serviceType", filters.serviceType);
-       if(filters?.venue) params.append('venue', filters.venue)
+      if (filters?.venue) params.append("venue", filters.venue);
       if (filters?.location && filters.location !== "All")
         params.append("city", filters.location);
-      if (filters?.username) params.append("username", filters.username);
+      if (filters?.businessName)
+        params.append(" businessName", filters.businessName);
       if (filters?.enablePrice) params.append("maxPrice", filters.maxPrice); // agar backend price filter support kare
 
       const res = await axios.get(

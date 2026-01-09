@@ -57,7 +57,18 @@ const Userschema = new mongoose.Schema(
         return this.role === "vendor";
       },
     },
+    isEmailVerified:{
+      type: Boolean, 
+      default: false,
+      
+    },
+    verificationToken: String,
+    status:{ type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+    reelPageLink: { type: String },
+    registrationLetter: { type: String },
+
   },
+  
   { timestamps: true }
 );
 

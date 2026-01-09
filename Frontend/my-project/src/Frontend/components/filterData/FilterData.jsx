@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 
 const FilterBox = ({ onSearch }) => {
-  const [username, setusername] = useState("");
+  const [ businessName, setbusinessName] = useState("");
   const [location, setLocation] = useState("All");
   const [enablePrice, setEnablePrice] = useState(false);
   const [maxPrice, setMaxPrice] = useState(200000);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const filters = { username, location, enablePrice, maxPrice };
+    const filters = {  businessName, location, enablePrice, maxPrice };
     if (onSearch) onSearch(filters);
   };
 
@@ -26,8 +26,8 @@ const FilterBox = ({ onSearch }) => {
         <input
           type="text"
           placeholder="Type Vendor Name"
-          value={username}
-          onChange={(e) => setusername(e.target.value)}
+          value={ businessName}
+          onChange={(e) => setbusinessName(e.target.value)}
           className="border rounded-md px-3 py-2 w-full focus:ring-2 focus:ring-[#94624b] outline-none"
         />
 

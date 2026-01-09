@@ -37,7 +37,7 @@ export const RegisterValidation = Yup.object({
       then: (schema) => schema.required("Wedding date is required"),
     }),
 
-  // ✅ Vendor fields
+  //  Vendor fields
   businessName: Yup.string()
     .nullable()
     .notRequired()
@@ -58,5 +58,13 @@ export const RegisterValidation = Yup.object({
     .when("role", {
       is: "vendor",
       then: (schema) => schema.required("Business address is required"),
+    }),
+  reelPageLink: Yup.string()
+    .url("Invalid URL format! (e.g., https://instagram.com/page)")
+    .required("Social media or Reel link is required"),
+  registrationLetter: Yup.mixed()
+    .required("Government registration letter is required")
+    .test("fileSize", "File size is too large", (value) => {
+      return value && value.size <= 2000000;
     }),
 });

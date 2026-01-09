@@ -1,9 +1,9 @@
 import express from "express";
 import {
-  getAllUser,
+ 
   login,
   Register,
-  updatestatus,
+  verifyEmail,
 } from "../controller/AuthController.js";
 import {
   deleteproduct,
@@ -17,23 +17,24 @@ import { authorizeRoles, tokenverify } from "../middleware/AuthMiddleWares.js";
 import { upload } from "../middleware/UploadMiddleWare.js";
 import { createBooking } from "../controller/BookingController.js";
 import { generateDeals } from "../controller/AiController.js";
+import { getAllUseradmin, updateVendorStatus } from "../controller/Admin.js";
 
 const router = express.Router();
 
-router.post("/registerform", Register);
+router.post("/registerform",upload.single("registrationLetter"), Register);
 router.post("/login", login);
 // start admin
 router.get(
   "/dashbaoard/admin/getdata",
   tokenverify,
   authorizeRoles("admin"),
-  getAllUser
+  getAllUseradmin
 );
 router.put(
   "/updateStatus/:userId",
   tokenverify,
   authorizeRoles("admin"),
-  updatestatus
+ updateVendorStatus
 );
 // end admin
 // start vendor
@@ -74,6 +75,8 @@ router.get("/getsingle/:id", getone);
 
 // ai integrate
 router.post("/deals", generateDeals);
+// booking
 router.post("/bookevent", createBooking);
-
+// verify email 
+router.get("/verify-email/:token" , verifyEmail)
 export default router;

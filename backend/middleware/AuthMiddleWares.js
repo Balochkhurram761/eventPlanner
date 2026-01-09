@@ -11,7 +11,7 @@ export const tokenverify = (req, res, next) => {
       });
     }
 
-    const token = authHeader.split(" ")[1]; // <-- Fix: space (" ") not empty string ("")
+    const token = authHeader.split(" ")[1]; 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = {
       _id: decoded.id,
