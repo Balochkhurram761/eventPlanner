@@ -17,6 +17,9 @@ import BookEvent1 from "./Frontend/components/bookEvent/BookEvent1";
 import AiPlanner from "./Frontend/components/aiPlanner/AiPlanner";
 import EventTodoList from "./Frontend/components/todolist/ToDoList";
 import GuestListManager from "./Frontend/components/guestmanagement/GuestManagement";
+import StrategicBusiness from "./Dashboard/vendor/pages/StrategicBusiness";
+import VendorInterviewModule from "./Dashboard/vendor/component/VendorInterview/VendorInterview";
+import VendorSettings from "./Dashboard/vendor/pages/Setting";
 const App = () => {
   return (
     <Routes>
@@ -24,7 +27,7 @@ const App = () => {
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/chat" element={<AiPlanner />} />
-      
+
         <Route path="/:serviceType/:venue/:id" element={<ProductUiDesc />} />
         {/* <Route path="/:serviceType/:id" element={<ProductUiDesc />} /> */}
         <Route path="/:serviceType/:venue" element={<ProductUI />} />
@@ -50,7 +53,17 @@ const App = () => {
         <Route element={<LayoutDashboardVd />}>
           <Route path="/dashboard/vendor" element={<DashboardVendor />} />
           <Route path="/vendor/products" element={<VendorProduct />} />
+          <Route
+            path="/vendor/BusinessStartegy"
+            element={<StrategicBusiness />}
+          />
+          <Route
+            path="/vendor/VendorInterview"
+            element={<VendorInterviewModule />}
+          />
         </Route>
+        <Route path="/vendor/settings" element={<VendorSettings />} />
+        
       </Route>
     </Routes>
   );

@@ -1,7 +1,7 @@
 import React from "react";
-import { useSearch } from "../../../admin/context/SearchContext";
+import { useProduct } from "../context/ProductContext";
 const Searchbar = () => {
-  const { searchQuery, setSearchQuery } = useSearch();
+  const { searchQuery, setSearchQuery } = useProduct();
 
   return (
     <div className="search  bg-white rounded-lg w-full">

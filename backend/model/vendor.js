@@ -36,6 +36,9 @@ const VendorSchema = new mongoose.Schema(
     images: {
       type: [String],
     },
+    videos: {
+      type: [String],
+    },
 
     // 🏛️ Hall specific fields
     venue: {
@@ -67,13 +70,13 @@ const VendorSchema = new mongoose.Schema(
         return this.serviceType === "hall";
       },
     },
-     hallcatering: {
+    hallcatering: {
       type: String,
       required: function () {
         return this.serviceType === "hall";
       },
     },
-     halldecor: {
+    halldecor: {
       type: String,
       required: function () {
         return this.serviceType === "hall";

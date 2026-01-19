@@ -1,57 +1,81 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { IoHomeOutline } from "react-icons/io5";
-import { CiUser } from "react-icons/ci";
-import { CiSettings } from "react-icons/ci";
+import { IoHomeOutline, IoChevronDownOutline } from "react-icons/io5";
+import { CiUser, CiSettings, CiLock } from "react-icons/ci";
+import { MdShoppingCart, MdOutlineNotificationsActive } from "react-icons/md";
+import { FiTrendingUp, FiVideo } from "react-icons/fi";
 import { useNavbar } from "../../../../Frontend/context/NavbarContext";
-import { MdShoppingCart } from "react-icons/md";
 
 const SideBar = () => {
   const location = useLocation();
   const { handleclose, navbar } = useNavbar();
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
   const menuItems = [
     { name: "Dashboard", path: "/dashboard/vendor", icon: <IoHomeOutline /> },
     { name: "Products", path: "/vendor/products", icon: <MdShoppingCart /> },
-    // { name: "Products", path: "/admin/products", icon: "" },
-    // { name: "Orders", path: "/admin/orders", icon: "" },
-    { name: "Settings", path: "/admin/settings", icon: <CiSettings /> },
+    { name: "Strategic Planning", path: "/vendor/BusinessStartegy", icon: <FiTrendingUp /> },
+    { name: "Vendor Interview", path: "/vendor/VendorInterview", icon: <FiVideo /> },
+  ];
+
+  const settingSubItems = [
+    { name: "Public Profile", path: "/vendor/settings/profile", icon: <CiUser /> },
+    { name: "Business Info", path: "/vendor/settings/business", icon: <CiSettings /> },
+    { name: "Security", path: "/vendor/settings/security", icon: <CiLock /> },
   ];
 
   return (
-    <div
-      className={`
-    fixed top-16 left-0 h-screen w-64 py-5 bg-gray-900 text-white shadow-lg flex flex-col 
-    transform transition-transform duration-300
-    lg:translate-x-0
-    ${navbar ? "translate-x-0" : "-translate-x-full"}
-  `}
-    >
-      <div className="heading">
-        <h1 className="text-xl text-center block lg:hidden font-semibold">
-          <span className="text-red-500 font-bold"> Wed</span>Event
-        </h1>
-      </div>
-      <ul className="flex flex-col gap-2 p-4 font-semibold">
+    <div className={`fixed top-0 left-0 h-screen w-72 pt-24 bg-[#020617] text-white shadow-2xl flex flex-col transform transition-all duration-500 border-r border-white/5 z-50 lg:translate-x-0 ${navbar ? "translate-x-0" : "-translate-x-full"}`}>
+      
+      <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
         {menuItems.map((item) => (
-          <li key={item.name}>
-            <Link
-              to={item.path}
-              onClick={handleclose} // click sidebar link me close karna
-              className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors duration-200
-            ${
-              location.pathname === item.path
-                ? "bg-yellow-500 text-black font-semibold"
-                : "hover:bg-gray-700 hover:text-yellow-400"
-            }`}
-            >
-              <span className="text-lg">{item.icon}</span>
-              <span>{item.name}</span>
-            </Link>
-          </li>
+          <Link
+            key={item.name}
+            to={item.path}
+            onClick={handleclose}
+            className={`flex items-center gap-4 px-5 py-4 rounded-xl transition-all duration-300 group ${location.pathname === item.path ? "bg-red-600 text-white shadow-lg shadow-red-600/20" : "hover:bg-white/5 text-gray-400 hover:text-white"}`}
+          >
+            <span className="text-2xl">{item.icon}</span>
+            <span className="text-sm tracking-wide font-bold">{item.name}</span>
+          </Link>
         ))}
-      </ul>
+
+        {/* --- SETTINGS DROPDOWN --- */}
+        <div className="space-y-1">
+          <button
+            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+            className={`w-full flex items-center justify-between gap-4 px-5 py-4 rounded-xl transition-all duration-300 group ${isSettingsOpen ? "bg-white/5 text-white" : "text-gray-400 hover:text-white hover:bg-white/5"}`}
+          >
+            <div className="flex items-center gap-4 cursor-pointer">
+              <CiSettings className="text-2xl" />
+              <span className="text-sm tracking-wide font-bold ">Settings</span>
+            </div>
+            <IoChevronDownOutline className={`transition-transform duration-300 ${isSettingsOpen ? "rotate-180" : ""}`} />
+          </button>
+
+          <div className={`overflow-hidden cursor-pointer transition-all duration-500 ease-in-out ${isSettingsOpen ? "max-h-64 opacity-100" : "max-h-0 opacity-0"}`}>
+            {settingSubItems.map((sub) => (
+              <Link
+                key={sub.name}
+                to={sub.path}
+                onClick={handleclose}
+                className="flex items-center gap-4 px-12 py-3 text-gray-500 hover:text-red-500 transition-colors text-sm font-bold"
+              >
+                <span className="text-xl">{sub.icon}</span>
+                {sub.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </nav>
+
+      <div className="p-6">
+        <div className="bg-gradient-to-br from-red-600/10 to-red-900/10 p-4 rounded-2xl border border-red-600/20">
+          <p className="text-[10px] uppercase text-red-500 font-black mb-1 tracking-widest">System Status</p>
+          <p className="text-[10px] text-gray-400 font-bold uppercase">Vendor Node: Active</p>
+        </div>
+      </div>
     </div>
   );
 };
-
 export default SideBar;

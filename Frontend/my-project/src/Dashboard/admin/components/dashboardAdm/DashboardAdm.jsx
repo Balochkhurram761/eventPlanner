@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useUser } from "../../context/userContext";
 import { FaUsers, FaUserCheck, FaUserClock, FaBoxOpen } from "react-icons/fa";
 import axios from "axios";
@@ -7,8 +7,7 @@ import Graph from "../analysitGrap/Graph";
 const DashboardAdm = () => {
   const { users } = useUser();
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true); // Loading state add ki
-
+  const [loading, setLoading] = useState(true); 
   const getproductdata = async () => {
     const storedUser = localStorage.getItem("user");
     if (!storedUser) return;
@@ -37,38 +36,39 @@ const DashboardAdm = () => {
     getproductdata();
   }, []);
 
-  const totalProducts = products?.length || 0;
-  const acceptedUsers =
-    users?.filter((u) => u.isApproved === true)?.length || 0;
-  const pendingUsers =
-    users?.filter((u) => u.isApproved === false)?.length || 0;
-  const totalUsers = users?.length || 0;
+  const statsData = useMemo(() => {
+    const totalUsers = users?.length || 0;
+    const accepted = users?.filter((u) => u.isApproved)?.length || 0;
+    const pending = users?.filter((u) => !u.isApproved)?.length || 0;
+    const totalProd = products?.length || 0;
 
+    return { totalUsers, accepted, pending, totalProd };
+  }, [users, products]);
   const stats = [
     {
       title: "Total Users",
-      value: totalUsers,
+      value: statsData.totalUsers,
       icon: <FaUsers />,
       color: "from-blue-600 to-blue-400",
       shadow: "shadow-blue-200",
     },
     {
       title: "Accepted Users",
-      value: acceptedUsers,
+      value: statsData.accepted,
       icon: <FaUserCheck />,
       color: "from-green-700 to-emerald-500",
       shadow: "shadow-green-200",
     },
     {
       title: "Pending Users",
-      value: pendingUsers,
+      value: statsData.pending,
       icon: <FaUserClock />,
       color: "from-orange-500 to-yellow-400",
       shadow: "shadow-orange-200",
     },
     {
       title: "Total Products",
-      value: totalProducts,
+      value: statsData.totalProd,
       icon: <FaBoxOpen />,
       color: "from-purple-600 to-pink-500",
       shadow: "shadow-purple-200",
@@ -77,7 +77,7 @@ const DashboardAdm = () => {
 
   return (
     <>
-      <div className="p-6 md:p-10 bg-gray-50 min-h-screen">
+      <div className=" bg-gray-50 min-h-screen">
         <div className="mb-8">
           <h1 className="text-3xl font-extrabold text-gray-800 tracking-tight">
             Admin Insights
@@ -143,9 +143,9 @@ const DashboardAdm = () => {
           </div>
         </div>
         <Graph
-          usersCount={totalUsers}
-          productsCount={totalProducts}
-          pendingCount={pendingUsers}
+          usersCount={statsData.totalUsers}
+          productsCount={statsData.totalProd}
+          pendingCount={statsData.pending}
         />
         <div className="mt-8 p-6 bg-white rounded-3xl border border-gray-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4 text-center sm:text-left">

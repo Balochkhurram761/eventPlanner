@@ -65,15 +65,6 @@ function AiPlanner() {
   };
 
   // 🔹 Helper: get price color (pink for car)
-  const getPriceColor = (vendor) => {
-    if (
-      vendor.serviceType?.toLowerCase() === "car" ||
-      vendor.service?.toLowerCase() === "carrental"
-    ) {
-      return "text-pink-600 font-bold";
-    }
-    return "text-green-600 font-semibold";
-  };
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -138,56 +129,70 @@ function AiPlanner() {
           <h2 className="text-2xl font-bold mb-4 text-gray-800">
             Recommended Vendor Combinations
           </h2>
-          <div className="grid sm:grid-cols-1 lg:grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-8">
             {deals.map((deal, i) => (
               <div
                 key={i}
-                className="p-4 border rounded-2xl shadow-md bg-white hover:shadow-lg transition"
+                className="p-6 border-2 border-blue-100 rounded-3xl shadow-lg bg-white"
               >
-                <h3 className="text-lg font-bold mb-2">
-                  Total Price: PKR {deal.totalPrice}
-                </h3>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-2xl font-bold text-blue-900">
+                    Package Option {i + 1}
+                  </h3>
+                  <span className="text-xl font-extrabold text-green-600 bg-green-50 px-4 py-1 rounded-full border border-green-200">
+                    Total: PKR {deal.totalPrice.toLocaleString()}
+                  </span>
+                </div>
 
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* horizontal scroll or grid for vendors in ONE deal */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {deal.services.map((s, j) => (
                     <div
                       key={j}
-                      className="p-3 border rounded-xl shadow-sm bg-pink-100"
+                      className="flex flex-col p-4 border rounded-2xl bg-gray-50 hover:bg-pink-50 transition"
                     >
-                      {s.vendor.images?.length > 0 ? (
+                      {/* Image logic */}
+                      {s.vendor?.images?.length > 0 ? (
                         <img
                           src={`http://localhost:5000/${s.vendor.images[0]}`}
-                          alt={s.vendor.title || "Vendor"}
-                          className="w-full h-32 object-cover rounded-lg mb-2"
+                          alt={s.vendor.title}
+                          className="w-full h-40 object-cover rounded-xl mb-3"
                         />
                       ) : (
-                        <div className="w-full h-32 bg-gray-200 rounded-lg mb-2 flex items-center justify-center text-gray-500">
-                          No Image
+                        <div className="w-full h-40 bg-gray-200 rounded-xl mb-3 flex items-center justify-center text-gray-400">
+                          No Image Available
                         </div>
                       )}
 
-                      <h4 className="text-md font-semibold mb-1">
-                        {s.vendor.title || s.vendor.venue || "Unnamed Vendor"}
-                      </h4>
-                      <p className="text-sm text-gray-600 capitalize">
-                        {s.service}
-                      </p>
-                      <p className={`${getPriceColor(s.vendor)} mt-1`}>
-                        PKR {getVendorPrice(s.vendor)}
-                      </p>
-                      <p className="text-sm text-gray-500 mb-2">
-                        {s.vendor.city || "Unknown Location"}
-                      </p>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-lg text-gray-800">
+                          {s.vendor?.title ||
+                            s.vendor?.name ||
+                            "Unnamed Vendor"}
+                        </h4>
+                        <p className="text-sm font-medium text-pink-500 uppercase tracking-wide">
+                          {s.service}
+                        </p>
+                        <p className="text-gray-600 text-sm mt-1">
+                          📍{" "}
+                          {s.vendor?.city ||
+                            s.vendor?.location ||
+                            "Location N/A"}
+                        </p>
+                        <p className="text-lg font-bold text-blue-700 mt-2">
+                          PKR {getVendorPrice(s.vendor).toLocaleString()}
+                        </p>
+                      </div>
 
-                      <button className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">
-                        Book Now
+                      <button className="mt-4 w-full bg-blue-600 text-white py-2 rounded-xl font-semibold hover:bg-blue-700">
+                        View Details
                       </button>
                     </div>
                   ))}
                 </div>
               </div>
             ))}
-          </div>
+          </div>{" "}
         </div>
       ) : (
         !loading && (

@@ -4,51 +4,46 @@ import Avatar from "@mui/material/Avatar";
 import Stack from "@mui/material/Stack";
 import Badge from "@mui/material/Badge";
 import { useNavigate } from "react-router-dom";
+import { CiUser } from "react-icons/ci";
 
 const ProfileViewVd = () => {
   const [open, setOpen] = useState(false);
-
   const navigate = useNavigate();
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    navigate("/login");
-  };
 
   return (
     <div className="relative">
-      <Stack
-        direction="row"
-        spacing={2}
-        alignItems="center"
-        className="cursor-pointer"
+      <div
+        onClick={() => setOpen(!open)}
+        className="p-1 rounded-full border-2 border-transparent hover:border-yellow-500 transition-all cursor-pointer shadow-lg"
       >
-        <Badge
-          overlap="circular"
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        >
-          <Avatar
-            alt="User Avatar"
-            src="/static/images/avatar/2.jpg"
-            sx={{ width: 40, height: 40 }}
-            onClick={() => setOpen(!open)}
-          />
-        </Badge>
-      </Stack>
+        <Avatar
+          alt="Admin"
+          src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+          sx={{ width: 45, height: 45, filter: "brightness(1.1)" }}
+        />
+      </div>
 
-      {/* Dropdown menu */}
       {open && (
-        <div className="absolute right-0 mt-2 w-40 bg-gray-900 shadow-lg rounded-md z-50">
-          <button className="block cursor-pointer w-full text-left px-4 py-2 text-white hover:bg-gray-500 ">
+        <div className="absolute right-0 mt-4 w-56 bg-gray-900 border border-gray-800 shadow-2xl rounded-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-5 duration-200">
+          <div className="p-4 bg-gray-800/50 border-b border-gray-700 text-center">
+            <p className="text-sm font-bold">Vendor Dashboard</p>
+            <p className="text-[10px] text-yellow-500 tracking-widest uppercase">
+              Verified Account
+            </p>
+          </div>
+          <button className="flex items-center cursor-pointer gap-3 w-full px-5 py-3 text-sm hover:bg-yellow-500 hover:text-black transition-all font-semibold">
+            <CiUser className="text-white text-xl hover:text-black" /> View
             Profile
           </button>
-          <hr />
           <button
-            className="block w-full cursor-pointer text-left px-4 py-2 text-white hover:bg-gray-500  "
-            onClick={handleLogout}
+            onClick={() => {
+              localStorage.removeItem("user");
+              navigate("/login");
+            }}
+            className="flex cursor-pointer items-center gap-3 w-full px-5 py-3 text-sm text-red-400 hover:bg-red-500 hover:text-white transition-all font-semibold"
           >
-            Logout
+            LogOut
           </button>
-          <hr />
         </div>
       )}
     </div>

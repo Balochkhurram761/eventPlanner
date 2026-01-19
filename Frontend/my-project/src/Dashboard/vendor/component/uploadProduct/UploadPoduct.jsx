@@ -3,6 +3,7 @@ import Dialog from "@mui/material/Dialog";
 import Slide from "@mui/material/Slide";
 import axios from "axios";
 import { useProduct } from "../context/ProductContext";
+import { RxCross1 } from "react-icons/rx";
 
 // Slide Transition
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -18,6 +19,7 @@ const UploadProduct = () => {
     title: "",
     description: "",
     images: [],
+    videos: [],
     hallCapacity: "",
     hallPricePerHead: "",
     hallparking: "",
@@ -178,21 +180,20 @@ const UploadProduct = () => {
   };
 
   //  Images
-  const handleImages = (e) => {
+  const handleMedia = (e, type) => {
     const files = Array.from(e.target.files);
     setProductForm((prev) => ({
       ...prev,
-      images: [...prev.images, ...files],
+      [type]: [...prev[type], ...files],
     }));
   };
 
-  const removeImage = (index) => {
+  const removeMedia = (index, type) => {
     setProductForm((prev) => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index),
+      [type]: prev[type].filter((_, i) => i !== index),
     }));
   };
-
   const roleChange = (value) => {
     setFiled(value);
     setProductForm((prev) => ({ ...prev, serviceType: value }));
@@ -207,11 +208,9 @@ const UploadProduct = () => {
     try {
       const formData = new FormData();
       Object.entries(productForm).forEach(([key, value]) => {
-        if (key === "images") {
-          value.forEach((file) => formData.append("images", file));
-        } else if (key === "cateringServices") {
-          formData.append("cateringServices", JSON.stringify(value));
-        } else if (Array.isArray(value)) {
+        if (key === "images" || key === "video") {
+          value.forEach((file) => formData.append("files", file));
+        } else if (Array.isArray(value) || typeof value === "object") {
           formData.append(key, JSON.stringify(value));
         } else {
           formData.append(key, value);
@@ -294,30 +293,62 @@ const UploadProduct = () => {
               className="border rounded-lg p-2 outline-none"
             />
 
-            {/* Image uploader */}
+            {/* Image Uploader */}
             <div>
-              <label className="font-medium text-sm mb-1 block">Images</label>
+              <label className="font-medium text-sm mb-1 block text-blue-600">
+                Product Images
+              </label>
               <input
                 type="file"
                 accept="image/*"
                 multiple
-                onChange={handleImages}
-                className="border p-2 rounded-lg w-full"
+                onChange={(e) => handleMedia(e, "images")}
+                className="border p-2 rounded-lg w-full mb-2"
               />
-              <div className="flex flex-wrap gap-3 mt-3">
+              <div className="flex flex-wrap gap-2">
                 {productForm.images.map((img, index) => (
                   <div key={index} className="relative">
                     <img
                       src={URL.createObjectURL(img)}
-                      alt="preview"
-                      className="w-20 h-20 object-cover rounded-lg border"
+                      className="w-16 h-16 object-cover rounded border"
                     />
                     <button
                       type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center"
+                      onClick={() => removeMedia(index, "images")}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs"
                     >
-                      ✕
+                      <RxCross1 />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Video Uploader */}
+            <div className="mt-4">
+              <label className="font-medium text-sm mb-1 block text-purple-600">
+                Product Videos
+              </label>
+              <input
+                type="file"
+                accept="video/*"
+                multiple
+                onChange={(e) => handleMedia(e, "videos")}
+                className="border p-2 rounded-lg w-full mb-2"
+              />
+              <div className="flex flex-wrap gap-2">
+                {productForm.videos.map((vid, index) => (
+                  <div key={index} className="relative">
+                    <video
+                      src={URL.createObjectURL(vid)}
+                      className="w-16 h-16 object-cover rounded border"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeMedia(index, "videos")}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs"
+                    >
+                      <RxCross1 />
                     </button>
                   </div>
                 ))}
@@ -760,7 +791,7 @@ const UploadProduct = () => {
                               }
                               className="px-2 bg-red-500 cursor-pointer text-white rounded"
                             >
-                              ✕
+                              <RxCross1 />
                             </button>
                           </div>
                         ))}

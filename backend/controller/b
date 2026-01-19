@@ -1,5 +1,190 @@
 import dotenv from "dotenv";
 import Vendor from "../model/vendor.js";
+
+dotenv.config();
+
+// -------------------- 1. Parse Prompt Function --------------------
+// Iska upar hona zaroori hai taaki generateDeals ise use kar sake
+function parsePrompt(prompt) {
+  const text = prompt.toLowerCase();
+  let budget = 0,
+    guests = 0,
+    city = "";
+  const services = [];
+
+  const budgetMatch = text.match(/(\d{3,})\s*(pkr|rs|rupees)?/);
+  if (budgetMatch) budget = parseInt(budgetMatch[1]);
+
+  const guestsMatch = text.match(
+    /(\d+)\s*(guest|guests|log|people|persons|invitees)/i
+  );
+  if (guestsMatch) guests = parseInt(guestsMatch[1]);
+
+  if (text.includes("catering")) services.push("catering");
+  if (text.includes("dj")) services.push("dj");
+  if (text.includes("photo")) services.push("photographers");
+  if (text.includes("hall") || text.includes("venue")) services.push("hall");
+  if (text.includes("car")) services.push("carrental");
+  if (text.includes("decor")) services.push("decorators");
+
+  if (text.includes("lahore")) city = "Lahore";
+  else if (text.includes("karachi")) city = "Karachi";
+  else if (text.includes("islamabad")) city = "Islamabad";
+
+  return { budget, guests, services, city };
+}
+
+// -------------------- 2. Price Calculation --------------------
+function getVendorPrice(vendor, guests) {
+  let price = 0;
+  const type =
+    vendor.serviceType?.toLowerCase() || vendor.service?.toLowerCase();
+
+  switch (type) {
+    case "hall":
+      price = vendor.hallPricePerHead || 0;
+      break;
+    case "catering":
+      price = vendor.cateringminPerHead || vendor.cateringmaxPerHead || 0;
+      break;
+    case "dj":
+      price = vendor.djRate || 0;
+      break;
+    case "photographers":
+      price = vendor.photographerStartingRange || 0;
+      break;
+    case "decorators":
+      price = vendor.decoratorminPrice || vendor.decoratormaxPrice || 0;
+      break;
+    case "car":
+    case "carrental":
+      price = vendor.carRentalPrice || 0;
+      break;
+    default:
+      price = 0;
+  }
+
+  return ["hall", "catering"].includes(type) ? price * (guests || 1) : price;
+}
+
+// -------------------- 3. Combination Helper --------------------
+function combineVendors(vendorLists) {
+  if (vendorLists.length === 0) return [[]];
+  const [firstList, ...rest] = vendorLists;
+  const restCombinations = combineVendors(rest);
+  const combinations = [];
+  for (const v of firstList) {
+    for (const r of restCombinations) {
+      combinations.push([v, ...r]);
+    }
+  }
+  return combinations;
+}
+
+// -------------------- 4. Llama 3 AI Summary --------------------
+async function getLlamaSummary(prompt, dealsCount) {
+  try {
+    const resp = await fetch("http://localhost:11434/api/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "llama3",
+        prompt: `A user requested: "${prompt}". I found ${dealsCount} matching vendor combinations. Summarize this planning status in 2 professional lines for the user.`,
+        stream: false,
+      }),
+    });
+    const data = await resp.json();
+    return data?.response?.trim() || "Event plan generated successfully.";
+  } catch (err) {
+    console.error("Ollama Error:", err.message);
+    return "AI Planning completed based on your budget and location.";
+  }
+}
+
+// -------------------- 5. Main Export Function --------------------
+export const generateDeals = async (req, res) => {
+  try {
+    let { prompt, budget, guests, services, city } = req.body;
+
+    // Yahan function ab access ho jayega
+    const parsed = prompt ? parsePrompt(prompt) : {};
+
+    budget = budget || parsed.budget;
+    guests = guests || parsed.guests || 1;
+    services = services?.length ? services : parsed.services;
+    city = city || parsed.city;
+
+    if (!budget || !services?.length || !city) {
+      return res
+        .status(400)
+        .json({ success: false, message: "City, Budget or Services missing." });
+    }
+
+    const locationRegex = new RegExp(city, "i");
+    const serviceRegex = services.map((s) => new RegExp(s, "i"));
+
+    const vendors = await Vendor.find({
+      $and: [
+        {
+          $or: [
+            { serviceType: { $in: serviceRegex } },
+            { service: { $in: serviceRegex } },
+          ],
+        },
+        { $or: [{ location: locationRegex }, { city: locationRegex }] },
+      ],
+    }).lean();
+
+    // Filtering & Combinations logic
+    const vendorsByService = services.map((service) =>
+      vendors.filter(
+        (v) =>
+          v.serviceType?.toLowerCase() === service ||
+          v.service?.toLowerCase() === service
+      )
+    );
+
+    const allCombinations = combineVendors(vendorsByService);
+
+    const validDeals = allCombinations
+      .map((combo) => {
+        const total = combo.reduce(
+          (sum, v) => sum + getVendorPrice(v, guests),
+          0
+        );
+        return {
+          totalPrice: total,
+          services: combo.map((v) => ({
+            service: v.serviceType || v.service,
+            vendor: v,
+          })),
+        };
+      })
+      .filter((d) => d.totalPrice <= budget)
+      .sort((a, b) => a.totalPrice - b.totalPrice);
+
+    // AI Summary call (Llama 3)
+    const ai_summary = prompt
+      ? await getLlamaSummary(prompt, validDeals.length)
+      : "Ready to book.";
+
+    res.status(200).json({
+      success: true,
+      budget,
+      guests,
+      location: city,
+      services,
+      deals: validDeals.slice(0, 10),
+      ai_summary,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+//new end
+import dotenv from "dotenv";
+import Vendor from "../model/vendor.js";
 import nlp from "compromise";
 
 dotenv.config();

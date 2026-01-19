@@ -1,10 +1,5 @@
 import express from "express";
-import {
- 
-  login,
-  Register,
-  verifyEmail,
-} from "../controller/AuthController.js";
+import { login, Register, verifyEmail } from "../controller/AuthController.js";
 import {
   deleteproduct,
   fetchdata,
@@ -17,11 +12,11 @@ import { authorizeRoles, tokenverify } from "../middleware/AuthMiddleWares.js";
 import { upload } from "../middleware/UploadMiddleWare.js";
 import { createBooking } from "../controller/BookingController.js";
 import { generateDeals } from "../controller/AiController.js";
-import { getAllUseradmin, updateVendorStatus } from "../controller/Admin.js";
+import {  getAllUseradmin, updateVendorStatus } from "../controller/Admin.js";
 
 const router = express.Router();
 
-router.post("/registerform",upload.single("registrationLetter"), Register);
+router.post("/registerform", upload.single("registrationLetter"), Register);
 router.post("/login", login);
 // start admin
 router.get(
@@ -34,15 +29,15 @@ router.put(
   "/updateStatus/:userId",
   tokenverify,
   authorizeRoles("admin"),
- updateVendorStatus
+  updateVendorStatus
 );
 // end admin
 // start vendor
 router.post(
   "/vendor/uploadproduct",
   tokenverify,
-  upload.array("images", 10),
   authorizeRoles("vendor"),
+  upload.array("files", 10),
   UploadProduct
 );
 
@@ -77,6 +72,6 @@ router.get("/getsingle/:id", getone);
 router.post("/deals", generateDeals);
 // booking
 router.post("/bookevent", createBooking);
-// verify email 
-router.get("/verify-email/:token" , verifyEmail)
+// verify email
+router.get("/verify-email/:token", verifyEmail);
 export default router;

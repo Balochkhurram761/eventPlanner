@@ -34,26 +34,30 @@ export const getAllUseradmin = async (req, res) => {
 export const updateVendorStatus = async (req, res) => {
   try {
     const { userId } = req.params;
-    
-    const { isApproved } = req.body; 
+
+    const { isApproved } = req.body;
 
     const user = await User.findByIdAndUpdate(
-      userId, 
-      { 
+      userId,
+      {
         isApproved: isApproved,
-        status: isApproved ? 'approved' : 'pending' 
-      }, 
+        status: isApproved ? "approved" : "pending",
+      },
       { new: true }
     );
 
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
-    
-    res.json({ 
-      success: true, 
-      message: `User status updated to ${isApproved ? 'Approved' : 'Pending'} successfully!`,
-      data: user 
+
+    res.json({
+      success: true,
+      message: `User status updated to ${
+        isApproved ? "Approved" : "Pending"
+      } successfully!`,
+      data: user,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

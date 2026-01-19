@@ -51,14 +51,21 @@ export const UploadProduct = async (req, res) => {
 
     const userId = req.user._id;
     console.log("token id ", userId);
-
+    const images =
+      req.files
+        ?.filter((file) => file.mimetype.startsWith("image"))
+        ?.map((file) => file.path) || [];
+    const videos =
+      req.files
+        ?.filter((file) => file.mimetype.startsWith("video"))
+        ?.map((file) => file.path) || [];
     const newVendor = new Vendor({
       user: userId,
       serviceType,
       title,
       description,
-      images: req.files?.map((file) => file.path) || [],
-
+     images: images, 
+      videos: videos,
       venue,
       hallCapacity,
       hallPricePerHead,
@@ -247,7 +254,8 @@ export const ProductUpdate = async (req, res) => {
 
 export const getdata = async (req, res) => {
   try {
-    const { serviceType, venue, city, search, businessName, maxPrice } = req.query;
+    const { serviceType, venue, city, search, businessName, maxPrice } =
+      req.query;
 
     let filter = {};
 
@@ -344,7 +352,3 @@ export const getone = async (req, res) => {
     });
   }
 };
-
-
-
-

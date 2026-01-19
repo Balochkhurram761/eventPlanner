@@ -81,7 +81,7 @@ const DashboardVd = () => {
   ];
 
   return (
-    <div className="p-4 md:p-10 bg-[#F8FAFC] min-h-screen font-sans selection:bg-indigo-100">
+    <div className="  bg-[#F8FAFC] pt-25 pb-5 px-15  min-h-screen font-sans selection:bg-indigo-100">
       {/* --- HEADER SECTION --- */}
       <div className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
@@ -103,8 +103,8 @@ const DashboardVd = () => {
         </div>
       </div>
 
-      {/* --- STATS CARDS (GLASSY & HEAVY) --- */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+      {/* --- STATS CARDS */}
+      <div className="grid grid-cols-1  md:grid-cols-3 -z-0 gap-8 mb-12">
         {orderStats.map((stat, index) => (
           <div
             key={index}
@@ -118,7 +118,7 @@ const DashboardVd = () => {
               </div>
             </div>
 
-            <div className="relative z-10">
+            <div className="relative z-5">
               <span className="bg-white/20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20">
                 {stat.growth}
               </span>

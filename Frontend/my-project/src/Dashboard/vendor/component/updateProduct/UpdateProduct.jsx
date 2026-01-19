@@ -19,6 +19,7 @@ const UpdateProduct = () => {
     title: "",
     description: "",
     images: [],
+    
     hallCapacity: "",
     hallPricePerHead: "",
     hallparking: "",
