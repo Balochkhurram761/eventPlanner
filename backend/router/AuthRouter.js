@@ -1,5 +1,11 @@
 import express from "express";
-import { login, Register, verifyEmail } from "../controller/AuthController.js";
+import {
+  getOneVendorData,
+  login,
+  putvendorOneupdate,
+  Register,
+  verifyEmail,
+} from "../controller/AuthController.js";
 import {
   deleteproduct,
   fetchdata,
@@ -12,7 +18,7 @@ import { authorizeRoles, tokenverify } from "../middleware/AuthMiddleWares.js";
 import { upload } from "../middleware/UploadMiddleWare.js";
 import { createBooking } from "../controller/BookingController.js";
 import { generateDeals } from "../controller/AiController.js";
-import {  getAllUseradmin, updateVendorStatus } from "../controller/Admin.js";
+import { getAllUseradmin, updateVendorStatus } from "../controller/Admin.js";
 
 const router = express.Router();
 
@@ -23,13 +29,13 @@ router.get(
   "/dashbaoard/admin/getdata",
   tokenverify,
   authorizeRoles("admin"),
-  getAllUseradmin
+  getAllUseradmin,
 );
 router.put(
   "/updateStatus/:userId",
   tokenverify,
   authorizeRoles("admin"),
-  updateVendorStatus
+  updateVendorStatus,
 );
 // end admin
 // start vendor
@@ -38,27 +44,41 @@ router.post(
   tokenverify,
   authorizeRoles("vendor"),
   upload.array("files", 10),
-  UploadProduct
+  UploadProduct,
 );
 
 router.get(
   "/vendor/fetchproduct",
   tokenverify,
   authorizeRoles("vendor"),
-  fetchdata
+  fetchdata,
 );
 router.delete(
   "/vendor/deleteproduct/:id",
   tokenverify,
   authorizeRoles("vendor"),
-  deleteproduct
+  deleteproduct,
 );
 router.put(
   "/vendor/updateproduct/:id",
-  upload.array("images"),
+  tokenverify,
+  authorizeRoles("vendor"),
+  upload.array("files", 10),
+  ProductUpdate,
+);
+router.get(
+  "/vendor/getvendordata/:id",
   tokenverify,
   authorizeRoles("vendor", "admin"),
-  ProductUpdate
+
+  getOneVendorData,
+);
+router.put(
+  "/vendor/putvendordata/:id",
+  upload.single('image'),
+  tokenverify,
+  authorizeRoles("vendor", "admin"),
+  putvendorOneupdate,
 );
 
 // getdata all in fronted

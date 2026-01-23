@@ -208,7 +208,7 @@ const UploadProduct = () => {
     try {
       const formData = new FormData();
       Object.entries(productForm).forEach(([key, value]) => {
-        if (key === "images" || key === "video") {
+        if (key === "images" || key === "videos") {
           value.forEach((file) => formData.append("files", file));
         } else if (Array.isArray(value) || typeof value === "object") {
           formData.append(key, JSON.stringify(value));

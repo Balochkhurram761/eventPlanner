@@ -7,6 +7,7 @@ export const ProductProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [preview, setPreview] = useState("uploads/profile.png");
 
   const [EditProduct, setEditProduct] = useState(null);
   const getproductdata = async () => {
@@ -41,6 +42,8 @@ export const ProductProvider = ({ children }) => {
         setSearchQuery,
         EditProduct,
         setEditProduct,
+        preview, 
+        setPreview,
       }}
     >
       {children}

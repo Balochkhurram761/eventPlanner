@@ -19,7 +19,7 @@ const UpdateProduct = () => {
     title: "",
     description: "",
     images: [],
-    
+    videos: [],
     hallCapacity: "",
     hallPricePerHead: "",
     hallparking: "",
@@ -134,7 +134,7 @@ const UpdateProduct = () => {
     setProductForm((prev) => {
       const themes = [...prev.detailsproduct];
       themes[index].details = themes[index].details.filter(
-        (_, i) => i !== subIndex
+        (_, i) => i !== subIndex,
       );
       return { ...prev, detailsproduct: themes };
     });
@@ -192,6 +192,13 @@ const UpdateProduct = () => {
       images: [...prev.images, ...files],
     }));
   };
+  const handleVidoes = (e) => {
+    const files = Array.from(e.target.files);
+    setProductForm((prev) => ({
+      ...prev,
+      videos: [...prev.videos, ...files],
+    }));
+  };
 
   const removeImage = (index) => {
     setProductForm((prev) => ({
@@ -226,7 +233,7 @@ const UpdateProduct = () => {
           // Handle images - send both existing and new images
           value.forEach((file) => {
             if (file instanceof File) {
-              formData.append("images", file);
+              formData.append("files", file);
             }
           });
 
@@ -234,6 +241,20 @@ const UpdateProduct = () => {
           const existingImages = value.filter((img) => !(img instanceof File));
           if (existingImages.length > 0) {
             formData.append("existingImages", JSON.stringify(existingImages));
+          }
+        }
+         if (key === "videos") {
+          // Handle images - send both existing and new images
+          value.forEach((file) => {
+            if (file instanceof File) {
+              formData.append("files", file);
+            }
+          });
+
+          // Also send existing images as a JSON array
+          const existingVideos = value.filter((vid) => !(vid instanceof File));
+          if (existingVideos.length > 0) {
+            formData.append("existingVideos", JSON.stringify(existingVideos));
           }
         } else if (key === "cateringServices") {
           formData.append(key, JSON.stringify(value));
@@ -249,7 +270,7 @@ const UpdateProduct = () => {
           // For all other fields including empty strings
           formData.append(
             key,
-            value !== null && value !== undefined ? value.toString() : ""
+            value !== null && value !== undefined ? value.toString() : "",
           );
         }
       });
@@ -267,14 +288,14 @@ const UpdateProduct = () => {
             authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
 
       // Update the product in the products list
       setProducts((prev) =>
         prev.map((product) =>
-          product._id === EditProduct._id ? data.data : product
-        )
+          product._id === EditProduct._id ? data.data : product,
+        ),
       );
 
       setProductForm(initialForm);
@@ -307,6 +328,7 @@ const UpdateProduct = () => {
       title: EditProduct.title || "",
       description: EditProduct.description || "",
       images: EditProduct.images || [],
+      videos: EditProduct.videos || [],
       hallCapacity: EditProduct.hallCapacity || "",
       hallPricePerHead: EditProduct.hallPricePerHead || "",
       hallparking: EditProduct.hallparking || "",
@@ -465,8 +487,8 @@ const UpdateProduct = () => {
                         img instanceof File
                           ? URL.createObjectURL(img) // New uploads
                           : img.startsWith("http")
-                          ? img // Absolute URL (if backend already sends full URL)
-                          : `http://localhost:5000/${img}` // Existing image filenames
+                            ? img // Absolute URL (if backend already sends full URL)
+                            : `http://localhost:5000/${img}` // Existing image filenames
                       }
                       alt="preview"
                       className="w-20 h-20 object-cover rounded-lg border"
@@ -487,7 +509,48 @@ const UpdateProduct = () => {
                 ))}
               </div>
             </div>
-
+            <div>
+              <label className="font-medium text-sm mb-1 block">Videos</label>
+              <input
+                type="file"
+                accept="video/*"
+                multiple
+                onChange={handleVidoes} // Ensure handleVideos state update kar raha hai
+                className="border p-2 rounded-lg w-full"
+              />
+              <div className="flex flex-wrap gap-3 mt-3">
+                {productForm.videos &&
+                  productForm.videos.map((vid, index) => (
+                    <div key={index} className="relative">
+                      {/* Video preview ke liye tag */}
+                      <video
+                        src={
+                          vid instanceof File
+                            ? URL.createObjectURL(vid)
+                            : vid.startsWith("http")
+                              ? vid
+                              : `http://localhost:5000/${vid}`
+                        }
+                        className="w-20 h-20 object-cover rounded-lg border"
+                        muted
+                        playsInline
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setProductForm((prev) => ({
+                            ...prev,
+                            videos: prev.videos.filter((_, i) => i !== index),
+                          }))
+                        }
+                        className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+              </div>
+            </div>
             {/* Hall fields */}
             {field === "hall" && (
               <>

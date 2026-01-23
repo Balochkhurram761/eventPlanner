@@ -7,7 +7,7 @@ const NavbarAdmin = () => {
   const { handlenavbar } = useNavbar();
 
   return (
-    <div className="w-full h-20 z-40 bg-[#0f172a] backdrop-blur-md text-white flex justify-between items-center px-8 border-b border-gray-800 shadow-[0_4px_20px_rgba(0,0,0,0.4)] fixed top-0 left-0 ">
+    <div className="w-full h-20 z-10 bg-[#0f172a] backdrop-blur-md text-white flex justify-between items-center px-8 border-b border-gray-800 shadow-[0_4px_20px_rgba(0,0,0,0.4)] fixed top-0 left-0 ">
       <div className="flex items-center gap-4">
         <div className="lg:hidden text-2xl cursor-pointer hover:text-yellow-500 transition-colors">
           <CiMenuBurger onClick={handlenavbar} />

@@ -32,8 +32,8 @@ const VendorInterviewModule = () => {
   ];
 
   return (
-    <div className="w-full min-h-screen bg-[#020617] text-white font-sans selection:bg-red-600">
-      <div className="pt-25 pb-5 px-15  w-full max-w-[1600px] mx-auto">
+    <div className="w-full min-h-screen pl-10 lg:pl-80  pr-10 pt-30 py-10 bg-[#020617] text-white font-sans selection:bg-red-600">
+      <div className="  w-full max-w-[1600px] mx-auto">
         {/* --- ELITE HEADER SECTION --- */}
         <div className="mb-12 flex flex-col md:flex-row justify-between items-center gap-8 border-b-2 border-slate-900 pb-10">
           <div className="text-center md:text-left">

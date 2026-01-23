@@ -14,20 +14,19 @@ const LayoutDashboard = () => {
           <div className="flex min-h-screen bg-gray-50">
             
             {/* 1. Sidebar - Fixed Width */}
-            <aside className="w-64 fixed inset-y-0 left-0 z-20 bg-white border-r">
+            <aside className=" ">
               <SideBar />
             </aside>
 
             {/* 2. Right Side Wrapper */}
-            <div className="flex-1 flex flex-col ml-64">
+            <div className="flex-1 flex flex-col ">
               
-              {/* 3. Navbar - Adjusted to start AFTER Sidebar (left-64) */}
               <header className="fixed top-0 right-0 left-64 z-10 h-16 bg-white border-b">
                 <NavbarAdmin />
               </header>
 
               {/* 4. Main Content Area */}
-              <main className="flex-1 mt-16 p-6">
+              <main className="flex-1  p-6">
                 <div className="">
                   <Outlet />
                 </div>

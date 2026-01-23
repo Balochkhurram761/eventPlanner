@@ -40,7 +40,7 @@ export const Register = async (req, res) => {
         vendorContactNo,
         businessAddress,
         isEmailVerified: false,
-        registrationLetter: registrationLetterPath, 
+        registrationLetter: registrationLetterPath,
         reelPageLink: reelPageLink,
       };
     }
@@ -173,9 +173,6 @@ export const verifyEmail = async (req, res) => {
   }
 };
 
-
-
-
 export const updateuser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -205,6 +202,77 @@ export const updateuser = async (req, res) => {
     res.status(500).send({
       message: "Server Error",
       success: false,
+    });
+  }
+};
+
+export const getOneVendorData = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const user = await User.findById(id)
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "User found",
+      data: user,
+    });
+  } catch (error) {
+    console.error("getOneVendorData error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+export const putvendorOneupdate = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const user = await User.findById(id)
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    const { name, businessName, vendorContactNo, businessAddress, reelPageLink } = req.body;
+
+    const updateData = {
+      name,
+      businessName,
+      vendorContactNo,
+      businessAddress,
+      reelPageLink,
+    };
+    if (req.file) {
+      updateData.image = [req.file.path]; 
+    }
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { $set: updateData },
+      { new: true, runValidators: true } 
+    ).select("-password");
+
+    res.status(200).json({
+      success: true,
+      message: "Profile Updated Successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error("getOneVendorData error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
     });
   }
 };

@@ -38,7 +38,7 @@ const StrategicBusinessPlanning = () => {
   ];
 
   return (
-    <div className=" bg-[#020617] w-full h-full pt-25 pb-5 px-15   text-white">
+    <div className=" bg-[#020617] pl-10 lg:pl-80  pr-10 pt-30 py-10  w-full h-full   text-white">
       {/* --- Header Section --- */}
       <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
         <div className="space-y-2">

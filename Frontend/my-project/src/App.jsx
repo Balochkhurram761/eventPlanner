@@ -19,7 +19,9 @@ import EventTodoList from "./Frontend/components/todolist/ToDoList";
 import GuestListManager from "./Frontend/components/guestmanagement/GuestManagement";
 import StrategicBusiness from "./Dashboard/vendor/pages/StrategicBusiness";
 import VendorInterviewModule from "./Dashboard/vendor/component/VendorInterview/VendorInterview";
-import VendorSettings from "./Dashboard/vendor/pages/Setting";
+import AIAssistantHelp from "./Dashboard/vendor/component/AISuggestionHelper/AISuggestionVendor";
+import SettingPage from "./Dashboard/vendor/pages/SettingPage";
+import Setting from "./Dashboard/admin/pages/Setting";
 const App = () => {
   return (
     <Routes>
@@ -45,6 +47,7 @@ const App = () => {
         <Route element={<LayoutDashboard />}>
           <Route path="/dashboard/admin" element={<DashboardAdmin />} />
           <Route path="/admin/users" element={<AllUser />} />
+          <Route path="/settings/Admin" element={<Setting/>} />
         </Route>
       </Route>
       {/* vendor protected routes */}
@@ -61,9 +64,12 @@ const App = () => {
             path="/vendor/VendorInterview"
             element={<VendorInterviewModule />}
           />
+          <Route
+            path="/vendor/VendorAIAssistant"
+            element={<AIAssistantHelp />}
+          />
+          <Route path="/vendor/settings/business" element={<SettingPage />} />
         </Route>
-        <Route path="/vendor/settings" element={<VendorSettings />} />
-        
       </Route>
     </Routes>
   );

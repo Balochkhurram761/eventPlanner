@@ -6,11 +6,13 @@ import {
   HiOutlineLogout,
   HiOutlineChevronDown,
 } from "react-icons/hi";
+import { useSearch } from "../../context/SearchContext";
 
 const ProfileView = () => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const { preview, setPreview } = useSearch();
 
   // Local storage se user ka data nikalna
   const user = JSON.parse(localStorage.getItem("user"));
@@ -39,7 +41,7 @@ const ProfileView = () => {
       >
         <Avatar
           alt={user?.name || "Admin"}
-          src={user?.avatar || "/static/images/avatar/2.jpg"}
+          src={preview || "/static/images/avatar/2.jpg"}
           sx={{
             width: 36,
             height: 36,
@@ -72,7 +74,7 @@ const ProfileView = () => {
           <div className="p-2">
             <button
               onClick={() => {
-                navigate("/admin/profile");
+                navigate("/settings/Admin");
                 setOpen(false);
               }}
               className="flex items-center cursor-pointerr gap-3 w-full px-3 py-2.5 text-sm text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-xl transition-colors group"

@@ -12,28 +12,30 @@ const LayoutDashboardVd = () => {
     <ProductProvider>
       <SearchProvider>
         <NavbarProvider>
-          {/* Main Wrapper */}
-          <div className="flex min-h-screen bg-gray-50">
-            {/* Sidebar - Fixed Width */}
-            <aside className="w-64 fixed inset-y-0 left-0 z-20 bg-white border-r">
+           <div className="flex min-h-screen bg-gray-50">
+            
+            {/* 1. Sidebar - Fixed Width */}
+            <aside className=" ">
               <SideBar />
             </aside>
 
-            {/* Right Side Content Area */}
-            <div className="flex-1 flex flex-col ml-64">
-              {/* Navbar - Fixed at Top, starts after Sidebar */}
-              <header className="fixed top-0 right-0 left-64 h-16 z-10 bg-white shadow-sm border-b">
+            {/* 2. Right Side Wrapper */}
+            <div className="flex-1 flex flex-col ">
+              
+              <header className="fixed top-0 right-0 left-64 z-10 h-16 bg-white border-b">
                 <NavbarAdmin />
               </header>
 
-              {/* Main Content (Outlet) */}
-              <main className="flex-1 ">
+              {/* 4. Main Content Area */}
+              <main className="flex-1  ">
                 <div className="">
                   <Outlet />
                 </div>
               </main>
+
             </div>
           </div>
+
         </NavbarProvider>
       </SearchProvider>
     </ProductProvider>

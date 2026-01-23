@@ -1,52 +1,22 @@
 import React, { useEffect } from "react";
-import axios from "axios";
 import { useSearch } from "../../context/SearchContext";
-import { useUser } from "../../context/userContext";
+import { useUser } from "../../context/userContext"; // Ensure correct path
 import { FaCheck, FaClock, FaExternalLinkAlt, FaFileAlt } from "react-icons/fa";
-import { IoIosArrowRoundForward } from "react-icons/io";
 
 const User = () => {
-  const { users, setUsers } = useUser();
+  const { users, fetchUsers, updatedStatus } = useUser();
   const { searchQuery } = useSearch();
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      const user = JSON.parse(localStorage.getItem(`user`));
-      const token = user?.token;
+    fetchUsers(searchQuery);
+  }, [searchQuery, fetchUsers]);
 
-      try {
-        const res = await axios.get(
-          `http://localhost:5000/api/auth/dashbaoard/admin/getdata?search=${searchQuery}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setUsers(res.data.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchUsers();
-  }, [searchQuery, setUsers]);
-
-  const updatedstatus = async ({ userId, isApproved }) => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = user?.token;
-
-    try {
-      await axios.put(
-        `http://localhost:5000/api/auth/updateStatus/${userId}`,
-        { isApproved },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setUsers((prevUsers) =>
-        prevUsers.map((u) => (u._id === userId ? { ...u, isApproved } : u))
-      );
-    } catch (error) {
-      console.error(error);
-    }
+  const handleStatusUpdate = async ({ userId, isApproved }) => {
+    await updatedStatus(userId, isApproved);
   };
 
   return (
-    <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
+    <div className="pl-10 lg:pl-70 pr-6 pt-15 pb-10  bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
           <h1 className="text-2xl font-extrabold text-gray-800">
@@ -57,7 +27,6 @@ const User = () => {
           </h1>
         </div>
 
-        {/* --- DESKTOP TABLE (Hidden on Mobile) --- */}
         <div className="hidden md:block bg-white shadow-xl rounded-xl overflow-hidden border border-gray-100">
           <table className="min-w-full">
             <thead className="bg-gray-800 text-white uppercase text-xs">
@@ -65,7 +34,7 @@ const User = () => {
                 <th className="px-6 py-4 text-left">User Details</th>
                 <th className="px-6 py-4 text-left">Role</th>
                 <th className="px-6 py-4 text-left">Links Verify</th>
-                <th className="px-6 py-4 text-left">Email Verifiy</th>
+                <th className="px-6 py-4 text-left">Email Verify</th>
                 <th className="px-6 py-4 text-center">Status</th>
               </tr>
             </thead>
@@ -124,18 +93,21 @@ const User = () => {
                   <td className="px-6 py-4">
                     {user.isEmailVerified ? (
                       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-200">
-                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>{" "}
                         Verified
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-200">
-                        <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>{" "}
                         Not Verified
                       </span>
                     )}
                   </td>
                   <td className="px-6 py-4 text-center">
-                    <StatusSelect user={user} updatedstatus={updatedstatus} />
+                    <StatusSelect
+                      user={user}
+                      updatedstatus={handleStatusUpdate}
+                    />
                   </td>
                 </tr>
               ))}
@@ -143,7 +115,7 @@ const User = () => {
           </table>
         </div>
 
-        {/* --- MOBILE CARDS (Visible only on Mobile) --- */}
+        {/* --- MOBILE CARDS (Design Unchanged) --- */}
         <div className="md:hidden grid grid-cols-1 gap-4">
           {users.map((user) => (
             <div
@@ -159,7 +131,6 @@ const User = () => {
                   {user.role}
                 </span>
               </div>
-
               <div className="flex gap-3 mb-4">
                 {user.reelPageLink && (
                   <a
@@ -178,23 +149,22 @@ const User = () => {
                   </a>
                 )}
               </div>
-              <div className="my-2" >
+              <div className="my-2">
                 {user.isEmailVerified ? (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-200">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>{" "}
                     Verified
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-200">
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>{" "}
                     Not Verified
                   </span>
                 )}
               </div>
-
               <StatusSelect
                 user={user}
-                updatedstatus={updatedstatus}
+                updatedstatus={handleStatusUpdate}
                 fullWidth={true}
               />
             </div>
@@ -211,7 +181,7 @@ const User = () => {
   );
 };
 
-// Reusable Status Dropdown Component
+// Reusable Status Dropdown Component (Design Unchanged)
 const StatusSelect = ({ user, updatedstatus, fullWidth }) => (
   <div className={`relative ${fullWidth ? "w-full" : "w-32 mx-auto"}`}>
     <select
@@ -232,7 +202,11 @@ const StatusSelect = ({ user, updatedstatus, fullWidth }) => (
       <option value="pending">Pending</option>
     </select>
     <div className="absolute right-2 top-2.5 pointer-events-none">
-      {user.isApproved ? <FaCheck size={12} /> : <FaClock size={12} />}
+      {user.isApproved ? (
+        <FaCheck size={12} className="text-green-600" />
+      ) : (
+        <FaClock size={12} className="text-yellow-600" />
+      )}
     </div>
   </div>
 );

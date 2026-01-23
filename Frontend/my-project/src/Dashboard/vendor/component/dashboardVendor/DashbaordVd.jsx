@@ -81,7 +81,7 @@ const DashboardVd = () => {
   ];
 
   return (
-    <div className="  bg-[#F8FAFC] pt-25 pb-5 px-15  min-h-screen font-sans selection:bg-indigo-100">
+    <div className="  bg-[#F8FAFC] pl-10 lg:pl-80  pr-10 pt-27 py-10 min-h-screen font-sans selection:bg-indigo-100">
       {/* --- HEADER SECTION --- */}
       <div className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>

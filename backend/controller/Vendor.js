@@ -64,7 +64,7 @@ export const UploadProduct = async (req, res) => {
       serviceType,
       title,
       description,
-     images: images, 
+      images: images,
       videos: videos,
       venue,
       hallCapacity,
@@ -208,6 +208,17 @@ export const ProductUpdate = async (req, res) => {
         ? req.files.map((f) => `uploads/${f.filename}`) // <- relative path
         : []),
     ];
+    const existingVideos = req.body.existingVideos
+      ? JSON.parse(req.body.existingVideos)
+      : [];
+
+    // Combine new uploaded files with existing images
+    const videos = [
+      ...existingVideos,
+      ...(req.files
+        ? req.files.map((f) => `uploads/${f.filename}`) // <- relative path
+        : []),
+    ];
 
     // Build the update object
     const updateFields = {
@@ -216,16 +227,17 @@ export const ProductUpdate = async (req, res) => {
       staff,
       cateringServices,
       images,
+      videos,
     };
 
     // Remove fields that were JSON strings (avoid double stringification)
     delete updateFields.existingImages;
-
+    delete updateFields.existingVideos;
     // Update the product
     const updatedData = await Vendor.findByIdAndUpdate(
       productId,
       { $set: updateFields },
-      { new: true, runValidators: true } //mongoose validator check
+      { new: true, runValidators: true }, //mongoose validator check
     );
 
     if (!updatedData) {

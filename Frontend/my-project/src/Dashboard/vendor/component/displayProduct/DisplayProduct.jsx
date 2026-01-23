@@ -33,7 +33,7 @@ const DisplayProduct = () => {
   };
 
   return (
-    <div className="min-h-screen pt-25 pb-5 px-15 bg-gray-50/50  ">
+    <div className="min-h-screen pl-10 lg:pl-80  pr-10 pt-27 py-10   bg-gray-50/50  ">
       <div className=" space-y-8">
         {/* --- Header Section --- */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">

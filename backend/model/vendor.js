@@ -251,7 +251,7 @@ const VendorSchema = new mongoose.Schema(
       default: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Vendor = mongoose.model("Vendor", VendorSchema);

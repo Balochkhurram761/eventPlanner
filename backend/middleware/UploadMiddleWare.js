@@ -1,6 +1,7 @@
 import multer from "multer";
 import path from "path";
 
+// Storage config
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/"); // make sure this folder exists
@@ -14,7 +15,10 @@ const storage = multer.diskStorage({
 
 // Accept images and videos
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith("image") || file.mimetype.startsWith("video")) {
+  if (
+    file.mimetype.startsWith("image") ||
+    file.mimetype.startsWith("video")
+  ) {
     cb(null, true);
   } else {
     cb(new Error("Only image and video files are allowed!"), false);
@@ -24,5 +28,5 @@ const fileFilter = (req, file, cb) => {
 export const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 500 * 1024 * 1024 }, // increased to 500MB for videos
+  limits: { fileSize: 500 * 1024 * 1024 }, // 500MB
 });

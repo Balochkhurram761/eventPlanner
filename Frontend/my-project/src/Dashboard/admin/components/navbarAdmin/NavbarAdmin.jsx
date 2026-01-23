@@ -1,7 +1,7 @@
 import React from "react";
 import Searchbar from "../search/Search";
 import ProfileView from "../profileView/ProfileView";
-import { HiMenuAlt2 } from "react-icons/hi"; // Thora better icon
+import { HiMenuAlt2 } from "react-icons/hi"; 
 import { useNavbar } from "../../../../Frontend/context/NavbarContext";
 
 const NavbarAdmin = () => {
