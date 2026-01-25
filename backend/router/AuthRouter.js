@@ -19,6 +19,7 @@ import { upload } from "../middleware/UploadMiddleWare.js";
 import { createBooking } from "../controller/BookingController.js";
 import { generateDeals } from "../controller/AiController.js";
 import { getAllUseradmin, updateVendorStatus } from "../controller/Admin.js";
+import { getBusinessInsights } from "../controller/aiConsultant.js";
 
 const router = express.Router();
 
@@ -90,6 +91,7 @@ router.get("/getsingle/:id", getone);
 
 // ai integrate
 router.post("/deals", generateDeals);
+router.get( "/business-insights" , tokenverify, authorizeRoles("vendor"), getBusinessInsights)
 // booking
 router.post("/bookevent", createBooking);
 // verify email
