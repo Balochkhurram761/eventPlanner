@@ -1,79 +1,160 @@
+
+
 import React, { useState, useEffect } from "react";
-import { IoMdClose } from "react-icons/io";
+import { 
+  Box, Typography, Paper, TextField, Button, Stack, 
+  IconButton, Checkbox, ListItemText, List, ListItem, Divider 
+} from "@mui/material";
+import { FaTrash, FaPlus, FaClipboardList, FaCheckCircle } from "react-icons/fa";
 
 export default function EventTodoList() {
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem("tasks");
-    return saved
-      ? JSON.parse(saved)
-      : [];
+    const saved = localStorage.getItem("event_tasks_v2");
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [newTask, setNewTask] = useState("");
 
   useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+    localStorage.setItem("event_tasks_v2", JSON.stringify(tasks));
   }, [tasks]);
 
   const addTask = () => {
     if (newTask.trim() === "") return;
-    setTasks([...tasks, newTask]);
+    setTasks([...tasks, { id: Date.now(), text: newTask, completed: false }]);
     setNewTask("");
   };
 
-  const removeTask = (index) => {
-    const updated = tasks.filter((_, i) => i !== index);
-    setTasks(updated);
+  const toggleComplete = (id) => {
+    setTasks(tasks.map(task => 
+      task.id === id ? { ...task, completed: !task.completed } : task
+    ));
+  };
+
+  const removeTask = (id) => {
+    setTasks(tasks.filter(task => task.id !== id));
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-slate-100 p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">
-        Event To-Do List
-      </h2>
+    <Box sx={{ 
+      minHeight: "100vh", 
+      bgcolor: "#030712", // Wahi deep dark background
+      py: 6, px: 2, 
+      color: "white" 
+    }}>
+      <Paper sx={{ 
+        maxWidth: 500, 
+        mx: "auto", 
+        p: { xs: 3, md: 4 }, 
+        bgcolor: "rgba(30, 41, 59, 0.5)", // Glassmorphism effect
+        backdropFilter: "blur(12px)",
+        borderRadius: "2rem",
+        border: "1px solid rgba(255, 255, 255, 0.1)",
+        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)"
+      }}>
+        
+        {/* Header */}
+        <Box sx={{ textAlign: "center", mb: 4 }}>
+          <Typography variant="h4" fontWeight="900" sx={{ 
+            background: "linear-gradient(to right, #ec4899, #8b5cf6)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            letterSpacing: "-1px"
+          }}>
+            EVENT TO-DO
+          </Typography>
+          <Typography variant="body2" sx={{ color: "#94a3b8", mt: 1, opacity: 0.8 }}>
+            Manage DJ, Hall, Catering & more
+          </Typography>
+        </Box>
 
-      <div className="bg-white shadow-lg rounded-2xl p-5 w-full max-w-sm">
-        <div className="flex mb-4">
-          <input
-            type="text"
-            value={newTask}
-            onChange={(e) => setNewTask(e.target.value)}
-            placeholder="Add new task (e.g. dj , hall etc"
-            className="flex-grow border rounded-lg px-3 py-2 focus:outline-none"
-          />
-          <button
-            onClick={addTask}
-            className="ml-2 bg-pink-600 text-white px-4 py-2 rounded-lg  hover:bg-pink-700 transition-colors duration-300 cursor-pointer"
-          >
-            Add
-          </button>
-        </div>
-
-        <ul className="space-y-2">
-          {tasks.map((task, index) => (
-            <li
-              key={index}
-              className="flex justify-between items-center bg-slate-50 p-2 rounded-lg"
+        {/* Input Section */}
+        <Box sx={{ 
+          bgcolor: "rgba(15, 23, 42, 0.6)", 
+          p: 2, borderRadius: "1.5rem", 
+          border: "1px solid rgba(236, 72, 153, 0.2)",
+          mb: 4 
+        }}>
+          <Stack direction="row" spacing={1}>
+            <TextField
+              fullWidth
+              placeholder="Add task (e.g. Booking DJ...)"
+              value={newTask}
+              onChange={(e) => setNewTask(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && addTask()}
+              InputProps={{ 
+                sx: { 
+                  color: "white", 
+                  borderRadius: "1rem",
+                  bgcolor: "rgba(255,255,255,0.05)" 
+                } 
+              }}
+            />
+            <Button
+              variant="contained"
+              onClick={addTask}
+              sx={{ 
+                borderRadius: "1rem",
+                minWidth: "60px",
+                background: "linear-gradient(to right, #db2777, #9333ea)",
+                "&:hover": { background: "linear-gradient(to right, #be185d, #7e22ce)" }
+              }}
             >
-              <span
-                className={`cursor-pointer ${
-                  task.startsWith(" ")
-                    ? "line-through text-gray-400"
-                    : "text-gray-700"
-                }`}
-              >
-                {task}
-              </span>
-              <button
-                onClick={() => removeTask(index)}
-                className="bg-pink-600 text-white px-4 py-2 rounded-lg  hover:bg-pink-700 transition-colors duration-300 cursor-pointer"
-              >
-                <IoMdClose />
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+              <FaPlus />
+            </Button>
+          </Stack>
+        </Box>
+
+        {/* Task List */}
+        <Typography variant="subtitle1" className="text-white" sx={{ mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
+          <FaClipboardList className="text-white" /> Pending Tasks ({tasks.filter(t => !t.completed).length})
+        </Typography>
+
+        <Stack spacing={1.5}>
+          {tasks.length === 0 ? (
+            <Typography sx={{ textAlign: "center", color: "#64748b", py: 4 }}>
+              Your list is empty. Start adding!
+            </Typography>
+          ) : (
+            tasks.map((task) => (
+              <Paper key={task.id} sx={{ 
+                p: 1.5, 
+                borderRadius: "1.2rem", 
+                bgcolor: task.completed ? "rgba(16, 185, 129, 0.05)" : "rgba(255, 255, 255, 0.03)",
+                border: task.completed ? "1px solid rgba(16, 185, 129, 0.2)" : "1px solid rgba(255,255,255,0.05)",
+                display: "flex", 
+                alignItems: "center",
+                transition: "0.3s"
+              }}>
+                <Checkbox 
+                  checked={task.completed} 
+                  onChange={() => toggleComplete(task.id)}
+                  sx={{ color: "#8b5cf6", '&.Mui-checked': { color: "#10b981" } }}
+                />
+                <ListItemText 
+                  primary={task.text} 
+                  sx={{ 
+                    color: task.completed ? "#94a3b8" : "white",
+                    textDecoration: task.completed ? "line-through" : "none"
+                  }} 
+                />
+                <IconButton onClick={() => removeTask(task.id)} sx={{ color: "#ef4444" }}>
+                  <FaTrash size={16} />
+                </IconButton>
+              </Paper>
+            ))
+          )}
+        </Stack>
+
+        {/* Footer Stats */}
+        {tasks.length > 0 && (
+          <Box sx={{ mt: 4, pt: 2, borderTop: "1px solid rgba(255,255,255,0.1)", textAlign: "center" }}>
+            <Typography variant="caption" sx={{ color: "#10b981", fontWeight: "bold", display: "flex", justifyContent: "center", alignItems: "center", gap: 0.5 }}>
+              <FaCheckCircle /> {tasks.filter(t => t.completed).length} Tasks Finished
+            </Typography>
+          </Box>
+        )}
+      </Paper>
+    </Box>
   );
 }

@@ -16,12 +16,12 @@ import ProductUiDesc from "./Frontend/components/ProductUiDesc/ProductUiDesc";
 import BookEvent1 from "./Frontend/components/bookEvent/BookEvent1";
 import AiPlanner from "./Frontend/components/aiPlanner/AiPlanner";
 import EventTodoList from "./Frontend/components/todolist/ToDoList";
-import GuestListManager from "./Frontend/components/guestmanagement/GuestManagement";
 import StrategicBusiness from "./Dashboard/vendor/pages/StrategicBusiness";
 import VendorInterviewModule from "./Dashboard/vendor/component/VendorInterview/VendorInterview";
 import AIAssistantHelp from "./Dashboard/vendor/component/AISuggestionHelper/AISuggestionVendor";
 import SettingPage from "./Dashboard/vendor/pages/SettingPage";
 import Setting from "./Dashboard/admin/pages/Setting";
+import GuestListManager from "./Frontend/components/guestmanagement/GuestManagement";
 const App = () => {
   return (
     <Routes>

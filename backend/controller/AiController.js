@@ -55,109 +55,133 @@ function getVendorPrice(vendor, guests) {
   return price;
 }
 
+// ... (aiParsePrompt aur getVendorPrice same rahengi)
+
 export const generateDeals = async (req, res) => {
   try {
     const { prompt: userPrompt } = req.body;
+
     const parsed = await aiParsePrompt(userPrompt);
     const { budget = 0, guests = 0, city = "", services = [] } = parsed || {};
 
-    // 1. Database se sirf wahi vendors nikalein jo user ne maange hain
-    const vendors = await Vendor.find({
-      serviceType: { $in: services.map((s) => new RegExp(s, "i")) },
-      city: new RegExp(city, "i"),
-    }).lean();
+    if (!city || city.trim() === "") {
+      return res.status(200).json({
+        success: false,
+        message: "Please enter a location to see deals.",
+      });
+    }
 
-    if (vendors.length === 0) {
-      return res
-        .status(200)
-        .json({
-          success: true,
-          deals: [],
-          budget,
-          guests,
-          location: city,
-          services,
-        });
+    // Step 2: Fetch Vendors and Shuffle
+    const vendors = await Vendor.aggregate([
+      {
+        $match: {
+          serviceType: { $in: services.map((s) => new RegExp(s, "i")) },
+          city: new RegExp(city, "i"),
+        },
+      },
+      { $sample: { size: 60 } }, // Thore zyada vendors uthayein variety ke liye
+    ]);
+
+    if (!vendors || vendors.length === 0) {
+      return res.status(200).json({
+        success: false,
+        message: `No vendors found in ${city}.`,
+      });
     }
 
     const vendorContext = vendors.map((v) => ({
       id: v._id,
       name: v.title,
-      type: v.serviceType,
-      price: getVendorPrice(v, guests), // Yeh total price calculate karta hai (Rate * Guests)
+      type: v.serviceType.toLowerCase(),
+      price: getVendorPrice(v, guests),
     }));
 
-    // 2. AI ko STRICT instruction dena
-   const aiDealPrompt = `
-      USER BUDGET: ${budget} PKR (STRICT LIMIT)
+    // Step 3: AI Prompt with STRICT Budget Rules
+    const aiDealPrompt = `
+      STRICT BUDGET LIMIT: ${budget} PKR
       GUESTS: ${guests}
       REQUIRED SERVICES: ${services.join(", ")}
+      AVAILABLE VENDORS: ${JSON.stringify(vendorContext)}
       
-      VENDORS DATA: ${JSON.stringify(vendorContext)}
-
-      TASK:
-      - Create 3 distinct packages.
-      - Each package MUST contain EXACTLY ${services.length} vendors (one for each required service).
-      - TOTAL PRICE of all vendors in a package MUST be <= ${budget}.
-      - DO NOT skip any service. If a service cannot fit in budget, find the cheapest possible combination.
-      - If it's impossible to fit ALL requested services under ${budget}, return an empty array [] instead of incomplete deals.
-
-      Return ONLY JSON: {"packages": [{"total": number, "vendorIds": ["id1", "id2", "id3"], "reason": "string"}]}
-    `;
+      INSTRUCTIONS:
+      1. Create 3 different packages.
+      2. Each package MUST include all ${services.length} services.
+      3. CRITICAL: The sum of vendor prices in each package MUST NOT EXCEED ${budget} PKR.
+      4. Avoid repeating the same vendor combinations across packages.
+      5. If the budget is too tight, pick the cheapest options available.
+      
+      Return ONLY JSON: {"packages": [{"total": number, "vendorIds": ["id1", "id2"], "reason": "string"}]}`;
 
     const dealResult = await groq.chat.completions.create({
-      messages: [{ role: "user", content: aiDealPrompt }],
-      model: "llama-3.1-8b-instant",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a precise event cost calculator. Never exceed the user's budget.",
+        },
+        { role: "user", content: aiDealPrompt },
+      ],
+      model: "llama-3.3-70b-versatile",
+      temperature: 0.7, // Balance between variety and logic
       response_format: { type: "json_object" },
     });
 
-    let rawData = JSON.parse(dealResult.choices[0].message.content);
-    let aiGeneratedDeals = rawData.packages || [];
+    const rawData = JSON.parse(dealResult.choices[0].message.content);
+    const aiGeneratedDeals = rawData.packages || [];
 
-    // 3. Final Check: Code level par budget aur service filter
-   const finalDeals = aiGeneratedDeals
+    // Step 4: Strict Final Validation
+    const finalDeals = aiGeneratedDeals
       .map((deal) => {
         const selectedVendors = (deal.vendorIds || [])
-          .map((id) => {
-            const v = vendors.find((vend) => vend._id.toString() === id.toString());
-            return v ? { service: v.serviceType, vendor: v } : null;
-          })
+          .map((id) => vendors.find((v) => v._id.toString() === id.toString()))
           .filter(Boolean);
 
+        // Calculate actual price again to double check AI
         const realTotal = selectedVendors.reduce(
-          (sum, item) => sum + getVendorPrice(item.vendor, guests),
+          (sum, v) => sum + getVendorPrice(v, guests),
           0,
+        );
+
+        // Check if all requested services are present
+        const selectedTypes = selectedVendors.map((v) =>
+          v.serviceType.toLowerCase(),
+        );
+        const hasAllServices = services.every((s) =>
+          selectedTypes.includes(s.toLowerCase()),
         );
 
         return {
           totalPrice: realTotal,
-          ai_reason: deal.reason,
-          services: selectedVendors,
-          serviceCount: selectedVendors.length // Count check karne ke liye
+          services: selectedVendors.map((v) => ({
+            service: v.serviceType,
+            vendor: v,
+          })),
+          // Strict Rule: Budget aur Services dono match hone chahiye
+          isValid:
+            realTotal <= budget &&
+            hasAllServices &&
+            selectedVendors.length === services.length,
         };
       })
-      // FIX: Budget bhi sahi ho OR services ki quantity bhi poori ho
-      .filter((deal) => 
-        deal.totalPrice > 0 && 
-        deal.totalPrice <= budget && 
-        deal.services.length === services.length // Sirf wahi deal dikhao jis mein sab services hon
-      )
-      
+      .filter((d) => d.isValid)
+      .sort((a, b) => a.totalPrice - b.totalPrice); // Sabse sasta package pehle dikhayein
+
+    if (finalDeals.length === 0) {
+      return res.status(200).json({
+        success: false,
+        message: `We couldn't find a combination of ${services.length} services within ${budget} PKR. Try increasing your budget or reducing services.`,
+      });
+    }
 
     res.status(200).json({
       success: true,
-      deals: finalDeals,
-      budget,
-      guests,
-      location: city,
-      services,
-      ai_summary:
-        finalDeals.length > 0
-          ? `Found ${finalDeals.length} options within your ${budget} budget.`
-          : `Sorry, we couldn't find a combination within ${budget} PKR for these services.`,
+      deals: finalDeals.slice(0, 3), // Top 3 valid deals
+      guests: guests,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: "AI generation failed" });
+    console.error("GROQ ERROR:", err.message);
+    res
+      .status(500)
+      .json({ success: false, message: "AI error: " + err.message });
   }
 };
