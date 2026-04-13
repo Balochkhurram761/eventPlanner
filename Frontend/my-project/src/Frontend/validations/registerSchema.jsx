@@ -60,11 +60,25 @@ export const RegisterValidation = Yup.object({
       then: (schema) => schema.required("Business address is required"),
     }),
   reelPageLink: Yup.string()
-    .url("Invalid URL format! (e.g., https://instagram.com/page)")
-    .required("Social media or Reel link is required"),
+    .nullable()
+    .notRequired()
+    .when("role", {
+      is: "vendor",
+      then: (schema) =>
+        schema
+          .required("Social media or Reel link is required")
+          .url("Invalid URL format! (e.g., https://instagram.com/page)"),
+    }),
   registrationLetter: Yup.mixed()
-    .required("Government registration letter is required")
-    .test("fileSize", "File size is too large", (value) => {
-      return value && value.size <= 2000000;
+    .nullable()
+    .notRequired()
+    .when("role", {
+      is: "vendor",
+      then: (schema) =>
+        schema
+          .required("Government registration letter is required")
+          .test("fileSize", "File size is too large", (value) => {
+            return value && value.size <= 2000000;
+          }),
     }),
 });

@@ -51,7 +51,7 @@ const UploadProduct = () => {
     carRentalDuration: "",
     Seats: "",
     Door: "",
-    detailsproduct: [
+    detailsproduct:[
       {
         title: "",
         price: "",

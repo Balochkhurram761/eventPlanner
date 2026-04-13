@@ -14,7 +14,7 @@ const Footer = () => {
         {/* Brand Section */}
         <div>
           <h2 className="text-3xl font-extrabold text-white mb-4 tracking-wide">
-            WebEvent
+            EventEase
           </h2>
           <p className="text-sm leading-6 text-gray-400 max-w-xs mx-auto md:mx-0">
             WebEvent.pk is Pakistan’s #1 Event Planning Portal & Mobile App.

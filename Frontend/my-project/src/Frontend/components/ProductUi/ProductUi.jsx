@@ -127,7 +127,7 @@ const ProductUI = () => {
                         onClick={() => navigate("/bookevent", { state: { product } })}
                         className="flex items-center gap-2 bg-pink-600 hover:bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-lg shadow-pink-100 transition-all duration-300 active:scale-95 group/btn"
                       >
-                        <span className="text-[10px] font-black uppercase tracking-widest">Book Now</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest cursor-pointer">Book Now</span>
                         <FaArrowRight size={10} className="group-hover/btn:translate-x-1 transition-transform" />
                       </button>
                     </div>

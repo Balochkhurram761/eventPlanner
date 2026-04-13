@@ -5,7 +5,7 @@ export const tokenverify = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!authHeader || !authHeader.startsWith("Bearer")) {
       return res.status(401).send({
         message: "Unauthorized",
       });

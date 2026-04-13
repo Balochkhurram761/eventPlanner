@@ -1,4 +1,5 @@
 import User from "../model/User12.js";
+import logger from "../logger/Logger.js";
 export const getAllUseradmin = async (req, res) => {
   try {
     const { search } = req.query;
@@ -61,5 +62,6 @@ export const updateVendorStatus = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+    logger.error(error.message)
   }
 };

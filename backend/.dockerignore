@@ -1,0 +1,10 @@
+node_modules
+.git
+#  mutiple file ko hide ko karna  *.txt or etc 
+# delete image in cmd  docker image rm name 
+# delete image in cmd to forcefullly jao container ma run ho rhi hain docker image rm name -f 
+# show list in cmd container  docker ps  -a 
+# docker container rm  containername 
+# docker container rm containername -f   jao phala sa run ho
+# delete all container or images in docker command is  docker system  prune - a
+# run directly in cmd image docker run --name basic-app-container-v2 -p 5500:5000 basic-app:v2

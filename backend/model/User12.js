@@ -38,7 +38,6 @@ const Userschema = new mongoose.Schema(
       },
     },
 
-    // ✅ Vendor-specific fields
     businessName: {
       type: String,
       required: function () {

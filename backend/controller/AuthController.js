@@ -153,12 +153,10 @@ export const verifyEmail = async (req, res) => {
 
     // 2. Status update karein
     user.isEmailVerified = true;
-    user.status = "pending"; // Email verify ho gayi, ab admin approval ka intezar hai
-    user.verificationToken = undefined; // Token delete kar dein taake dobara use na ho
-
+    user.status = "pending"; 
+    user.verificationToken = undefined; 
     await user.save();
 
-    // 3. Vendor ko success message dikhayen
     res.send(`
       <div style="font-family: sans-serif; text-align: center; padding-top: 50px;">
         <h1 style="color: green;">Email Verified Successfully! </h1>

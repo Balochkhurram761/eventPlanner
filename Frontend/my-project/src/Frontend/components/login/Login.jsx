@@ -38,7 +38,7 @@ const Login = () => {
         })
       );
 
-      toast.success("Login successful 🎉", { position: "top-right" });
+      toast.success("Login successful ", { position: "top-right" });
 
       if (response.data.user.role === "admin") {
         navigate("/dashboard/admin");
@@ -46,7 +46,7 @@ const Login = () => {
         navigate("/dashboard/vendor");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Login failed ❌");
+      toast.error(error.response?.data?.message || "Login failed ");
     }
   };
 

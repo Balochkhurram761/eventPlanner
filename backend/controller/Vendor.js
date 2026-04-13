@@ -50,7 +50,6 @@ export const UploadProduct = async (req, res) => {
     } = req.body;
 
     const userId = req.user._id;
-    console.log("token id ", userId);
     const images =
       req.files
         ?.filter((file) => file.mimetype.startsWith("image"))
@@ -128,7 +127,6 @@ export const fetchdata = async (req, res) => {
 
     let filter = { user: userId };
 
-    // sirf tabhi filter lagao jab search diya ho
     if (search && search.trim() !== "") {
       filter.$or = [
         { title: { $regex: search, $options: "i" } },

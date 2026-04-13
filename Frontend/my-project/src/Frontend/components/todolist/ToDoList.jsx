@@ -38,7 +38,7 @@ export default function EventTodoList() {
   return (
     <Box sx={{ 
       minHeight: "100vh", 
-      bgcolor: "#030712", // Wahi deep dark background
+      bgcolor: "#030712", 
       py: 6, px: 2, 
       color: "white" 
     }}>
@@ -46,7 +46,7 @@ export default function EventTodoList() {
         maxWidth: 500, 
         mx: "auto", 
         p: { xs: 3, md: 4 }, 
-        bgcolor: "rgba(30, 41, 59, 0.5)", // Glassmorphism effect
+        bgcolor: "rgba(30, 41, 59, 0.5)", 
         backdropFilter: "blur(12px)",
         borderRadius: "2rem",
         border: "1px solid rgba(255, 255, 255, 0.1)",

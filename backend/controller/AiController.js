@@ -79,7 +79,7 @@ export const generateDeals = async (req, res) => {
           city: new RegExp(city, "i"),
         },
       },
-      { $sample: { size: 60 } }, // Thore zyada vendors uthayein variety ke liye
+      { $sample: { size: 60 } }, 
     ]);
 
     if (!vendors || vendors.length === 0) {
@@ -122,14 +122,14 @@ export const generateDeals = async (req, res) => {
         { role: "user", content: aiDealPrompt },
       ],
       model: "llama-3.3-70b-versatile",
-      temperature: 0.7, // Balance between variety and logic
+      temperature: 0.7, 
       response_format: { type: "json_object" },
     });
 
-    const rawData = JSON.parse(dealResult.choices[0].message.content);
+    const rawData = JSON.parse(dealResult.choices[0].message.content);  //string hota hai, lekin JSON format mein.
     const aiGeneratedDeals = rawData.packages || [];
 
-    // Step 4: Strict Final Validation
+    // Step 4: Strict Final Validation ai vendor check real vendor match
     const finalDeals = aiGeneratedDeals
       .map((deal) => {
         const selectedVendors = (deal.vendorIds || [])

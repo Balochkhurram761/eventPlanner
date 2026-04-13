@@ -15,7 +15,7 @@ const Navbar = () => {
             to="/"
             className="font-heading text-[27px] font-bold tracking-wide text-pink-600"
           >
-            Wed<span className="text-gray-800">Event</span>
+            Event<span className="text-gray-800">Ease</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -157,4 +157,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default React.memo(Navbar);
